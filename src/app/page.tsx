@@ -4,7 +4,7 @@ import { site, UNITS } from "@/lib/site";
 const faqs = [
   {
     q: "How is AP Precalculus different from regular precalculus?",
-    a: "AP Precalculus follows the College Board framework and ends with a standardized AP exam in May: 40+ multiple-choice questions (some calculator-active, some not) plus 4 free-response questions. The pacing and question style are specific — we train you on exactly that format.",
+    a: "AP Precalculus follows the College Board framework and ends with a standardized AP exam in May: 42 multiple-choice questions (29 no-calculator, 13 calculator-active) plus 4 free-response questions. The pacing and question style are specific — we train you on exactly that format.",
   },
   {
     q: "Which units does the practice cover?",
@@ -99,8 +99,8 @@ export default function Home() {
           <div className="card">
             <h3 className="font-bold text-brand-700">Section I: Multiple Choice</h3>
             <p className="mt-2 text-sm text-slate-600">
-              40+ questions across two parts — one without a graphing calculator, one with. About two-thirds of your exam score.
-              Our timed sets train the no-calculator fluency this section demands.
+              42 questions across two parts — 29 without a graphing calculator (65 min) and 13 with one (40 min).
+              Worth 62.5% of your exam score. Our timed sets train the no-calculator fluency this section demands.
             </p>
           </div>
           <div className="card">

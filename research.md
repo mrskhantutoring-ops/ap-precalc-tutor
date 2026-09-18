@@ -6,7 +6,7 @@ original and written from scratch — this file contains only public structural 
 (exam format, unit names, weightings), never copied questions.
 
 ## Exam format (AP Precalculus)
-- Section I: Multiple Choice — 40+ questions in two parts (calculator not permitted / permitted), ~65% of score
+- Section I: Multiple Choice — 42 questions (Part A: 29 Qs, 65 min, no calculator; Part B: 13 Qs, 40 min, graphing calculator required), 62.5% of score (effective May 2027; College Board AP Central)
 - Section II: Free Response — 4 questions × 3 parts (A/B/C), ~35% of score
 - Mathematical practices: Procedural & Symbolic Fluency, Multiple Representations, Communication & Reasoning
 

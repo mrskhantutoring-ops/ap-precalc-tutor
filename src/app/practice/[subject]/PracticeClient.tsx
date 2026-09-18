@@ -25,6 +25,14 @@ const TIMED_PRESETS: Record<string, { label: string; minutes: number; count: num
     { label: "AP MCQ Part A style (15 Qs · 30 min · no calculator)", minutes: 30, count: 15 },
     { label: "Quick drill (10 Qs · 15 min)", minutes: 15, count: 10 },
   ],
+  "unit-3": [
+    { label: "AP MCQ Part A style (15 Qs · 30 min · no calculator)", minutes: 30, count: 15 },
+    { label: "Quick drill (10 Qs · 15 min)", minutes: 15, count: 10 },
+  ],
+  "unit-4": [
+    { label: "AP MCQ Part A style (15 Qs · 30 min · no calculator)", minutes: 30, count: 15 },
+    { label: "Quick drill (10 Qs · 15 min)", minutes: 15, count: 10 },
+  ],
 };
 
 function formatTime(s: number) {

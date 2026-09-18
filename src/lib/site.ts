@@ -44,6 +44,18 @@ export const UNITS = [
     blurb: "College Board weighting 25–40% · exponential and logarithmic functions",
     domains: ["Exponential Functions", "Logarithmic Functions", "Log Properties", "Solving Equations", "Modeling & Applications"],
   },
+  {
+    id: "unit-3",
+    name: "Unit 3: Trigonometric & Polar Functions",
+    blurb: "College Board weighting 30–35% · trig, sinusoidal and polar functions",
+    domains: ["Unit Circle & Trig Values", "Sinusoidal Graphs", "Sinusoidal Modeling", "Trig Equations & Identities", "Inverse Trig Functions", "Polar Coordinates", "Polar Graphs"],
+  },
+  {
+    id: "unit-4",
+    name: "Unit 4: Parameters, Vectors & Matrices",
+    blurb: "Course unit · parametric functions, vectors, matrices (not on the AP exam)",
+    domains: ["Parametric Functions", "Vectors", "Matrices"],
+  },
 ] as const;
 
 // Kept as an alias so existing components/APIs written against SUBJECTS keep working.

@@ -1,5 +1,5 @@
 /**
- * AP Precalculus question bank — 40 ORIGINAL questions written from scratch
+ * AP Precalculus question bank — 79 ORIGINAL questions written from scratch
  * in College Board AP Precalculus style. None are copied from the College Board,
  * released exams, or any prep source.
  * @typedef {{subject:string, domain:string, difficulty:string, prompt:string,
@@ -334,5 +334,277 @@ export const QUESTIONS = [
     choices: ["1000(1.05)^t", "1000(0.95)^t", "1000 + 50t", "1000(1.5)^t"],
     correctIndex: 0, correctText: "1000(1.05)^t",
     explanation: "Each year the balance is multiplied by 1 + 0.05 = 1.05, so after t years: 1000(1.05)^t.",
+  },
+
+  // ================= UNIT 3: TRIGONOMETRIC & POLAR FUNCTIONS =================
+
+  // ---------- Unit Circle & Trig Values ----------
+  {
+    subject: "unit-3", domain: "Unit Circle & Trig Values", difficulty: "easy",
+    prompt: "What is the exact value of sin(π/6)?",
+    choices: ["1/2", "√3/2", "√2/2", "1"], correctIndex: 0, correctText: "1/2",
+    explanation: "On the unit circle, the point at angle π/6 is (√3/2, 1/2). Since sin θ is the y-coordinate, sin(π/6) = 1/2.",
+  },
+  {
+    subject: "unit-3", domain: "Unit Circle & Trig Values", difficulty: "easy",
+    prompt: "What is the exact value of cos(5π/6)?",
+    choices: ["√3/2", "-√3/2", "1/2", "-1/2"], correctIndex: 1, correctText: "-√3/2",
+    explanation: "The angle 5π/6 is in Quadrant II with reference angle π/6. Cosine is negative in Quadrant II, so cos(5π/6) = −√3/2.",
+  },
+  {
+    subject: "unit-3", domain: "Unit Circle & Trig Values", difficulty: "easy",
+    prompt: "What is the exact value of tan(π/4)?",
+    choices: ["0", "1/2", "1", "√3"], correctIndex: 2, correctText: "1",
+    explanation: "tan θ = sin θ / cos θ. At π/4, sin(π/4) = cos(π/4) = √2/2, so tan(π/4) = 1.",
+  },
+  {
+    subject: "unit-3", domain: "Unit Circle & Trig Values", difficulty: "medium",
+    prompt: "If sin θ = 3/5 and θ is in Quadrant II, what is cos θ?",
+    choices: ["4/5", "-4/5", "3/4", "-3/4"], correctIndex: 1, correctText: "-4/5",
+    explanation: "By the Pythagorean identity, cos²θ = 1 − sin²θ = 1 − 9/25 = 16/25, so cos θ = ±4/5. Cosine is negative in Quadrant II, so cos θ = −4/5.",
+  },
+  {
+    subject: "unit-3", domain: "Unit Circle & Trig Values", difficulty: "medium",
+    prompt: "If cos θ = −1/3, what is the value of sec θ?",
+    choices: ["-3", "-1/3", "3", "1/3"], correctIndex: 0, correctText: "-3",
+    explanation: "Secant is the reciprocal of cosine: sec θ = 1/cos θ = 1/(−1/3) = −3.",
+  },
+
+  // ---------- Sinusoidal Graphs ----------
+  {
+    subject: "unit-3", domain: "Sinusoidal Graphs", difficulty: "easy",
+    prompt: "For the function f(x) = 3 sin(2x), what is the period?",
+    choices: ["π/2", "π", "2π", "4π"], correctIndex: 1, correctText: "π",
+    explanation: "The period of sin(Bx) is 2π/B. Here B = 2, so the period is 2π/2 = π.",
+  },
+  {
+    subject: "unit-3", domain: "Sinusoidal Graphs", difficulty: "easy",
+    prompt: "What is the midline of the graph of g(x) = −2 cos(x) + 5?",
+    choices: ["y = −2", "y = 2", "y = 5", "y = 0"], correctIndex: 2, correctText: "y = 5",
+    explanation: "The midline of a sinusoid a·cos(Bx) + d is the horizontal line y = d. Here d = 5, so the midline is y = 5.",
+  },
+  {
+    subject: "unit-3", domain: "Sinusoidal Graphs", difficulty: "medium",
+    prompt: "A sinusoidal function has a maximum value of 7 and a minimum value of −3. What is its amplitude?",
+    choices: ["2", "5", "7", "10"], correctIndex: 1, correctText: "5",
+    explanation: "Amplitude = (max − min)/2 = (7 − (−3))/2 = 10/2 = 5.",
+  },
+  {
+    subject: "unit-3", domain: "Sinusoidal Graphs", difficulty: "medium",
+    prompt: "The graph of h(x) = sin(x − π/3) is the graph of sin(x) shifted how?",
+    choices: ["π/3 units to the left", "π/3 units to the right", "π/6 units to the right", "π/3 units up"],
+    correctIndex: 1, correctText: "π/3 units to the right",
+    explanation: "Replacing x with (x − π/3) shifts the graph π/3 units to the right (the phase shift).",
+  },
+  {
+    subject: "unit-3", domain: "Sinusoidal Graphs", difficulty: "hard",
+    prompt: "For f(x) = 2 sin(3x − π) + 1, what is the period of f?",
+    choices: ["2π/3", "π/3", "2π", "3π/2"], correctIndex: 0, correctText: "2π/3",
+    explanation: "Rewrite as 2 sin(3(x − π/3)) + 1. The coefficient of x is 3, so the period is 2π/3.",
+  },
+
+  // ---------- Sinusoidal Modeling ----------
+  {
+    subject: "unit-3", domain: "Sinusoidal Modeling", difficulty: "medium",
+    prompt: "A rider boards a Ferris wheel at its lowest point at time t = 0 seconds. The wheel has radius 10 feet, its center is 12 feet above the ground, and it completes one revolution every 60 seconds. The rider's height is modeled by h(t) = −10 cos(2πt/60) + 12. What is the rider's height at t = 15 seconds?",
+    choices: ["2 feet", "12 feet", "22 feet", "10 feet"], correctIndex: 1, correctText: "12 feet",
+    explanation: "At t = 15: h(15) = −10 cos(2π·15/60) + 12 = −10 cos(π/2) + 12 = −10(0) + 12 = 12 feet.",
+  },
+  {
+    subject: "unit-3", domain: "Sinusoidal Modeling", difficulty: "hard",
+    prompt: "The depth of water at a harbor is modeled by d(t) = 4 sin(πt/6) + 9, where t is hours after midnight. What is the first time after midnight that the water depth is 11 feet?",
+    choices: ["1 hour", "2 hours", "3 hours", "6 hours"], correctIndex: 0, correctText: "1 hour",
+    explanation: "Set 4 sin(πt/6) + 9 = 11, giving sin(πt/6) = 1/2. The first positive solution is πt/6 = π/6, so t = 1 hour.",
+  },
+
+  // ---------- Trig Equations & Identities ----------
+  {
+    subject: "unit-3", domain: "Trig Equations & Identities", difficulty: "medium",
+    prompt: "How many solutions does the equation tan²x = 3 have on the interval [0, 2π)?",
+    choices: ["1", "2", "3", "4"], correctIndex: 3, correctText: "4",
+    explanation: "tan²x = 3 gives tan x = √3 or tan x = −√3. tan x = √3 at x = π/3 and 4π/3; tan x = −√3 at x = 2π/3 and 5π/3. That is 4 solutions.",
+  },
+  {
+    subject: "unit-3", domain: "Trig Equations & Identities", difficulty: "medium",
+    prompt: "Which of the following is equivalent to (1 − cos²x) / sin x for sin x ≠ 0?",
+    choices: ["sin x", "cos x", "tan x", "1"], correctIndex: 0, correctText: "sin x",
+    explanation: "By the Pythagorean identity, 1 − cos²x = sin²x. So (sin²x)/(sin x) = sin x.",
+  },
+  {
+    subject: "unit-3", domain: "Trig Equations & Identities", difficulty: "medium",
+    prompt: "What are all solutions of 2 sin(x) = 1 on the interval [0, 2π)?",
+    choices: ["π/6 and 5π/6", "π/3 and 2π/3", "π/6 only", "5π/6 and 7π/6"],
+    correctIndex: 0, correctText: "π/6 and 5π/6",
+    explanation: "2 sin x = 1 gives sin x = 1/2. On [0, 2π), sine equals 1/2 at x = π/6 (Quadrant I) and x = 5π/6 (Quadrant II).",
+  },
+
+  // ---------- Inverse Trig Functions ----------
+  {
+    subject: "unit-3", domain: "Inverse Trig Functions", difficulty: "medium",
+    prompt: "What is the exact value of arcsin(√3/2)?",
+    choices: ["π/6", "π/3", "π/4", "2π/3"], correctIndex: 1, correctText: "π/3",
+    explanation: "arcsin gives the angle in [−π/2, π/2] whose sine is √3/2. That angle is π/3.",
+  },
+  {
+    subject: "unit-3", domain: "Inverse Trig Functions", difficulty: "medium",
+    prompt: "What is the exact value of arctan(1)?",
+    choices: ["π/4", "3π/4", "−π/4", "5π/4"], correctIndex: 0, correctText: "π/4",
+    explanation: "arctan gives the angle in (−π/2, π/2) whose tangent is 1. That angle is π/4.",
+  },
+
+  // ---------- Polar Coordinates ----------
+  {
+    subject: "unit-3", domain: "Polar Coordinates", difficulty: "easy",
+    prompt: "What are the rectangular coordinates of the point with polar coordinates (r, θ) = (2, π/3)?",
+    choices: ["(1, √3)", "(√3, 1)", "(2, √3)", "(1, 2)"], correctIndex: 0, correctText: "(1, √3)",
+    explanation: "x = r cos θ = 2 cos(π/3) = 2(1/2) = 1; y = r sin θ = 2 sin(π/3) = 2(√3/2) = √3. So the point is (1, √3).",
+  },
+  {
+    subject: "unit-3", domain: "Polar Coordinates", difficulty: "medium",
+    prompt: "Which of the following is another polar representation of the point (3, π/4)?",
+    choices: ["(−3, 5π/4)", "(3, 5π/4)", "(−3, π/4)", "(3, −π/4)"],
+    correctIndex: 0, correctText: "(−3, 5π/4)",
+    explanation: "Negating r and adding π to θ gives the same point: (−3, π/4 + π) = (−3, 5π/4).",
+  },
+
+  // ---------- Polar Graphs ----------
+  {
+    subject: "unit-3", domain: "Polar Graphs", difficulty: "medium",
+    prompt: "Which of the following best describes the graph of r = 2 cos θ?",
+    choices: [
+      "A circle of radius 2 centered at the origin",
+      "A circle of radius 1 centered at (1, 0)",
+      "A line through the origin",
+      "A cardioid",
+    ],
+    correctIndex: 1, correctText: "A circle of radius 1 centered at (1, 0)",
+    explanation: "Multiply by r: r² = 2r cos θ, so x² + y² = 2x, or (x − 1)² + y² = 1 — a circle of radius 1 centered at (1, 0).",
+  },
+  {
+    subject: "unit-3", domain: "Polar Graphs", difficulty: "medium",
+    prompt: "How many petals does the rose curve r = 3 sin(2θ) have?",
+    choices: ["2", "3", "4", "6"], correctIndex: 2, correctText: "4",
+    explanation: "For r = a sin(nθ) with n even, the rose has 2n petals. Here n = 2, so there are 4 petals.",
+  },
+
+  // ================= UNIT 4: PARAMETERS, VECTORS & MATRICES =================
+  // Note: Unit 4 is part of the AP Precalculus course but is not assessed on the AP exam.
+
+  // ---------- Parametric Functions ----------
+  {
+    subject: "unit-4", domain: "Parametric Functions", difficulty: "easy",
+    prompt: "A curve is defined parametrically by x = t + 1 and y = 2t. Which rectangular equation describes the same curve?",
+    choices: ["y = 2x − 2", "y = 2x + 1", "y = x + 2", "y = 2x"],
+    correctIndex: 0, correctText: "y = 2x − 2",
+    explanation: "From x = t + 1, t = x − 1. Substituting into y = 2t gives y = 2(x − 1) = 2x − 2.",
+  },
+  {
+    subject: "unit-4", domain: "Parametric Functions", difficulty: "easy",
+    prompt: "For the parametric equations x = t² and y = t + 1, what point corresponds to t = 2?",
+    choices: ["(4, 3)", "(2, 3)", "(4, 5)", "(2, 5)"],
+    correctIndex: 0, correctText: "(4, 3)",
+    explanation: "Substitute t = 2: x = 2² = 4 and y = 2 + 1 = 3, so the point is (4, 3).",
+  },
+  {
+    subject: "unit-4", domain: "Parametric Functions", difficulty: "medium",
+    prompt: "The parametric equations x = cos t, y = sin t for 0 ≤ t ≤ π/2 trace a quarter circle. Which statement describes the direction of motion as t increases?",
+    choices: [
+      "Counterclockwise from (1, 0) to (0, 1)",
+      "Clockwise from (1, 0) to (0, 1)",
+      "Counterclockwise from (0, 1) to (1, 0)",
+      "Clockwise from (0, 1) to (−1, 0)",
+    ],
+    correctIndex: 0, correctText: "Counterclockwise from (1, 0) to (0, 1)",
+    explanation: "At t = 0 the point is (cos 0, sin 0) = (1, 0); at t = π/2 it is (0, 1). As t increases the point moves counterclockwise along the unit circle.",
+  },
+  {
+    subject: "unit-4", domain: "Parametric Functions", difficulty: "medium",
+    prompt: "A particle moves with position x(t) = 2t and y(t) = t² for t ≥ 0. What is the particle's position at t = 3?",
+    choices: ["(6, 9)", "(3, 6)", "(6, 6)", "(2, 9)"],
+    correctIndex: 0, correctText: "(6, 9)",
+    explanation: "x(3) = 2(3) = 6 and y(3) = 3² = 9, so the position is (6, 9).",
+  },
+  {
+    subject: "unit-4", domain: "Parametric Functions", difficulty: "hard",
+    prompt: "A particle's position is given by x(t) = t − 1 and y(t) = 2 − t. Which rectangular equation describes its path?",
+    choices: ["y = 1 − x", "y = x + 1", "y = 3 − x", "y = x − 1"],
+    correctIndex: 0, correctText: "y = 1 − x",
+    explanation: "From x = t − 1, t = x + 1. Then y = 2 − (x + 1) = 1 − x.",
+  },
+
+  // ---------- Vectors ----------
+  {
+    subject: "unit-4", domain: "Vectors", difficulty: "easy",
+    prompt: "What is the magnitude of the vector v = ⟨3, 4⟩?",
+    choices: ["5", "7", "12", "25"], correctIndex: 0, correctText: "5",
+    explanation: "Magnitude = √(3² + 4²) = √(9 + 16) = √25 = 5.",
+  },
+  {
+    subject: "unit-4", domain: "Vectors", difficulty: "easy",
+    prompt: "What is the sum ⟨1, 2⟩ + ⟨3, −1⟩?",
+    choices: ["⟨4, 1⟩", "⟨4, 3⟩", "⟨2, 1⟩", "⟨3, 1⟩"],
+    correctIndex: 0, correctText: "⟨4, 1⟩",
+    explanation: "Add component-wise: ⟨1 + 3, 2 + (−1)⟩ = ⟨4, 1⟩.",
+  },
+  {
+    subject: "unit-4", domain: "Vectors", difficulty: "medium",
+    prompt: "What is the direction angle (from the positive x-axis) of the vector ⟨1, 1⟩?",
+    choices: ["30°", "45°", "60°", "135°"], correctIndex: 1, correctText: "45°",
+    explanation: "tan θ = 1/1 = 1 with both components positive (Quadrant I), so θ = 45°.",
+  },
+  {
+    subject: "unit-4", domain: "Vectors", difficulty: "medium",
+    prompt: "What is the dot product ⟨2, 3⟩ · ⟨−1, 4⟩?",
+    choices: ["10", "8", "−10", "14"], correctIndex: 0, correctText: "10",
+    explanation: "⟨2, 3⟩ · ⟨−1, 4⟩ = (2)(−1) + (3)(4) = −2 + 12 = 10.",
+  },
+  {
+    subject: "unit-4", domain: "Vectors", difficulty: "medium",
+    prompt: "For what value of a are the vectors ⟨a, 2⟩ and ⟨3, −6⟩ perpendicular?",
+    choices: ["2", "4", "−4", "6"], correctIndex: 1, correctText: "4",
+    explanation: "Perpendicular vectors have dot product 0: (a)(3) + (2)(−6) = 3a − 12 = 0, so a = 4.",
+  },
+
+  // ---------- Matrices ----------
+  {
+    subject: "unit-4", domain: "Matrices", difficulty: "easy",
+    prompt: "What is [[1, 2], [3, 4]] + [[0, 1], [1, 0]]?",
+    choices: ["[[1, 3], [4, 4]]", "[[1, 2], [4, 4]]", "[[0, 3], [3, 0]]", "[[1, 3], [3, 4]]"],
+    correctIndex: 0, correctText: "[[1, 3], [4, 4]]",
+    explanation: "Add entry-wise: [[1+0, 2+1], [3+1, 4+0]] = [[1, 3], [4, 4]].",
+  },
+  {
+    subject: "unit-4", domain: "Matrices", difficulty: "easy",
+    prompt: "What is the determinant of [[3, 1], [2, 4]]?",
+    choices: ["10", "14", "12", "−10"], correctIndex: 0, correctText: "10",
+    explanation: "det = (3)(4) − (1)(2) = 12 − 2 = 10.",
+  },
+  {
+    subject: "unit-4", domain: "Matrices", difficulty: "medium",
+    prompt: "What is the product [[1, 2], [3, 4]] × [[2, 0], [1, 2]]?",
+    choices: ["[[4, 4], [10, 8]]", "[[2, 4], [3, 8]]", "[[4, 2], [10, 6]]", "[[3, 4], [7, 12]]"],
+    correctIndex: 0, correctText: "[[4, 4], [10, 8]]",
+    explanation: "Row-by-column: top-left (1)(2)+(2)(1)=4; top-right (1)(0)+(2)(2)=4; bottom-left (3)(2)+(4)(1)=10; bottom-right (3)(0)+(4)(2)=8.",
+  },
+  {
+    subject: "unit-4", domain: "Matrices", difficulty: "medium",
+    prompt: "What is the inverse of [[2, 0], [0, 3]]?",
+    choices: ["[[1/2, 0], [0, 1/3]]", "[[2, 0], [0, 3]]", "[[1/2, 0], [0, 3]]", "[[−2, 0], [0, −3]]"],
+    correctIndex: 0, correctText: "[[1/2, 0], [0, 1/3]]",
+    explanation: "For a diagonal matrix, the inverse inverts each diagonal entry: [[1/2, 0], [0, 1/3]]. Check: [[2,0],[0,3]]·[[1/2,0],[0,1/3]] = I.",
+  },
+  {
+    subject: "unit-4", domain: "Matrices", difficulty: "medium",
+    prompt: "The matrix [[0, −1], [1, 0]] represents a 90° counterclockwise rotation about the origin. What is the image of the point (1, 0)?",
+    choices: ["(0, 1)", "(0, −1)", "(−1, 0)", "(1, 0)"],
+    correctIndex: 0, correctText: "(0, 1)",
+    explanation: "[[0,−1],[1,0]] · [1, 0]ᵀ = [0·1 + (−1)·0, 1·1 + 0·0]ᵀ = (0, 1).",
+  },
+  {
+    subject: "unit-4", domain: "Matrices", difficulty: "hard",
+    prompt: "What is the solution (x, y) of the matrix equation [[1, 2], [3, 4]] · [x, y]ᵀ = [5, 11]ᵀ?",
+    choices: ["(1, 2)", "(2, 1)", "(3, −1)", "(−1, 3)"],
+    correctIndex: 0, correctText: "(1, 2)",
+    explanation: "Multiply both sides by the inverse [[−2, 1], [3/2, −1/2]]: x = −2(5) + 1(11) = 1, y = (3/2)(5) − (1/2)(11) = 2. Check: 1 + 4 = 5 and 3 + 8 = 11.",
   },
 ];
