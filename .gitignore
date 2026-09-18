@@ -20,3 +20,8 @@
 *.log
 .vercel
 tsconfig.tsbuildinfo
+.env*
+.agents/
+.claude/
+agent/
+skills-lock.json
