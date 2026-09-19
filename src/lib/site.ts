@@ -30,31 +30,47 @@ export const site = {
 };
 
 // AP Precalculus units covered on this site (College Board exam assesses Units 1–3;
-// Unit 4 is not on the AP exam).
+// Unit 4 is not on the AP exam). Each unit gets its own pastel color family for cards.
 export const UNITS = [
   {
     id: "unit-1",
     name: "Unit 1: Polynomial & Rational Functions",
+    short: "Unit 1",
     blurb: "College Board weighting 30–40% · polynomial and rational functions",
     domains: ["Polynomial Functions", "Rational Functions", "End Behavior", "Zeros & Factors", "Graphing & Modeling"],
+    icon: "📈",
+    count: 20,
+    tint: { bg: "#FEFCE8", border: "#FEF08A", chipBg: "#FEF08A", chipText: "#A16207" },
   },
   {
     id: "unit-2",
     name: "Unit 2: Exponential & Logarithmic Functions",
+    short: "Unit 2",
     blurb: "College Board weighting 25–40% · exponential and logarithmic functions",
     domains: ["Exponential Functions", "Logarithmic Functions", "Log Properties", "Solving Equations", "Modeling & Applications"],
+    icon: "📊",
+    count: 22,
+    tint: { bg: "#F0F9FF", border: "#BAE6FD", chipBg: "#BAE6FD", chipText: "#0369A1" },
   },
   {
     id: "unit-3",
     name: "Unit 3: Trigonometric & Polar Functions",
+    short: "Unit 3",
     blurb: "College Board weighting 30–35% · trig, sinusoidal and polar functions",
     domains: ["Unit Circle & Trig Values", "Sinusoidal Graphs", "Sinusoidal Modeling", "Trig Equations & Identities", "Inverse Trig Functions", "Polar Coordinates", "Polar Graphs"],
+    icon: "🔺",
+    count: 21,
+    tint: { bg: "#F5F3FF", border: "#DDD6FE", chipBg: "#DDD6FE", chipText: "#6D28D9" },
   },
   {
     id: "unit-4",
     name: "Unit 4: Parameters, Vectors & Matrices",
+    short: "Unit 4",
     blurb: "Course unit · parametric functions, vectors, matrices (not on the AP exam)",
     domains: ["Parametric Functions", "Vectors", "Matrices"],
+    icon: "🧭",
+    count: 16,
+    tint: { bg: "#fdedf2", border: "#f2cad7", chipBg: "#FBCFE8", chipText: "#BE185D" },
   },
 ] as const;
 

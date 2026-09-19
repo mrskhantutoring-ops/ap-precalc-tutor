@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 
 type Question = {
   id: string;
@@ -15,6 +16,7 @@ type Question = {
 };
 
 type Phase = "setup" | "answering" | "results";
+type Mode = "drill" | "untimed" | number;
 
 const TIMED_PRESETS: Record<string, { label: string; minutes: number; count: number }[]> = {
   "unit-1": [
@@ -41,6 +43,36 @@ function formatTime(s: number) {
   return `${m}:${r.toString().padStart(2, "0")}`;
 }
 
+function ScoreRing({ correct, total }: { correct: number; total: number }) {
+  const r = 54;
+  const c = 2 * Math.PI * r;
+  const pct = total ? correct / total : 0;
+  return (
+    <div className="relative mx-auto h-36 w-36">
+      <svg viewBox="0 0 120 120" className="h-full w-full -rotate-90">
+        <circle cx="60" cy="60" r={r} fill="none" stroke="#e2e8f0" strokeWidth="12" />
+        <circle
+          cx="60" cy="60" r={r} fill="none" stroke="#16a34a" strokeWidth="12" strokeLinecap="round"
+          strokeDasharray={c} strokeDashoffset={c * (1 - pct)}
+          style={{ transition: "stroke-dashoffset 0.8s ease" }}
+        />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span className="text-3xl font-extrabold text-black">{correct}/{total}</span>
+        <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">correct</span>
+      </div>
+    </div>
+  );
+}
+
+function drillHeading(correct: number, total: number): [string, string] {
+  const pct = total ? correct / total : 0;
+  if (pct === 1) return ["Perfect score!", "Flawless. Enjoy it — then try a timed set for exam pressure."];
+  if (pct >= 0.8) return ["Great work!", "Just a miss or two — review the explanations to lock it in."];
+  if (pct >= 0.6) return ["Good effort!", "You're close. Re-read the explanations and run it back."];
+  return ["Keep practicing!", "Every rep counts. Review each explanation, then drill again."];
+}
+
 export default function PracticeClient({
   subjectId,
   subjectName,
@@ -53,7 +85,7 @@ export default function PracticeClient({
   const [phase, setPhase] = useState<Phase>("setup");
   const [domain, setDomain] = useState<string>("all");
   const [difficulty, setDifficulty] = useState<string>("all");
-  const [mode, setMode] = useState<"untimed" | number>("untimed");
+  const [mode, setMode] = useState<Mode>("drill");
   const [count, setCount] = useState(10);
 
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -73,17 +105,27 @@ export default function PracticeClient({
   const warnedRef = useRef({ five: false, one: false });
   const finishedRef = useRef(false);
 
+  // Drill mode state: every question stacked on one page, one click answers.
+  const [drillAnswers, setDrillAnswers] = useState<Record<string, { selected: number; correct: boolean }>>({});
+  const drillAttempts = useRef<{ id: string; correct: boolean; timeMs: number }[]>([]);
+  const drillStartRef = useRef<number>(Date.now());
+
   const timed = typeof mode === "number";
+  const isDrill = mode === "drill";
+
+  const postAttempts = useCallback((list: { id: string; correct: boolean; timeMs: number }[]) => {
+    fetch("/api/attempts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ attempts: list }),
+    }).catch(() => {});
+  }, []);
 
   const finish = useCallback(() => {
     setPhase("results");
     // Persist attempts for logged-in users (best effort; anonymous users keep local results)
-    fetch("/api/attempts", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ attempts: answers }),
-    }).catch(() => {});
-  }, [answers]);
+    postAttempts(answers);
+  }, [answers, postAttempts]);
 
   // Guard: the interval can fire as the set ends — finish exactly once
   // so attempts are never double-posted.
@@ -120,10 +162,10 @@ export default function PracticeClient({
     setLoading(true);
     setError(null);
     try {
-      const requested = timed ? TIMED_PRESETS[subjectId][mode as number].count : count;
+      const requested = isDrill ? 5 : timed ? TIMED_PRESETS[subjectId][mode as number].count : count;
       const params = new URLSearchParams({ subject: subjectId, limit: String(requested) });
       if (domain !== "all") params.set("domain", domain);
-      if (difficulty !== "all") params.set("difficulty", difficulty);
+      if (difficulty !== "all" && !isDrill) params.set("difficulty", difficulty);
       const res = await fetch(`/api/questions?${params}`);
       if (!res.ok) throw new Error("Could not load questions.");
       const data = await res.json();
@@ -147,6 +189,10 @@ export default function PracticeClient({
       setTimeWarning(null);
       warnedRef.current = { five: false, one: false };
       finishedRef.current = false;
+      // Drill reset
+      setDrillAnswers({});
+      drillAttempts.current = [];
+      drillStartRef.current = Date.now();
       if (timed) {
         const minutes = TIMED_PRESETS[subjectId][mode as number].minutes;
         deadlineRef.current = Date.now() + minutes * 60 * 1000;
@@ -190,15 +236,51 @@ export default function PracticeClient({
     questionStart.current = Date.now();
   }
 
+  // Drill: one click answers immediately — no separate check step.
+  function answerDrill(question: Question, choiceIdx: number) {
+    if (drillAnswers[question.id]) return;
+    const correct = choiceIdx === question.correctIndex;
+    const nextAnswers = { ...drillAnswers, [question.id]: { selected: choiceIdx, correct } };
+    setDrillAnswers(nextAnswers);
+    const attempt = { id: question.id, correct, timeMs: Date.now() - drillStartRef.current };
+    drillAttempts.current = [...drillAttempts.current, attempt];
+    setAnswers(drillAttempts.current);
+    if (Object.keys(nextAnswers).length === questions.length) {
+      postAttempts(drillAttempts.current);
+    }
+  }
+
   if (phase === "setup") {
     const presets = TIMED_PRESETS[subjectId] ?? [];
     return (
       <div className="mx-auto max-w-2xl space-y-6">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight">{subjectName} practice</h1>
-          <p className="mt-2 text-slate-600">Pick your filters, then start. Explanations appear after every question.</p>
+          <p className="mt-2 text-slate-600">Pick a mode, then start. Explanations appear after every question.</p>
         </div>
         <div className="card space-y-5">
+          <div>
+            <label className="label">Mode</label>
+            <div className="space-y-2">
+              <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 p-3 text-sm hover:border-slate-300">
+                <input type="radio" checked={mode === "drill"} onChange={() => setMode("drill")} />
+                <span>
+                  <strong>Quick drill</strong> — 5 questions, instant feedback
+                  <span className="ml-2 rounded-full bg-black px-2 py-0.5 text-xs font-bold text-white">RECOMMENDED</span>
+                </span>
+              </label>
+              <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 p-3 text-sm hover:border-slate-300">
+                <input type="radio" checked={mode === "untimed"} onChange={() => setMode("untimed")} />
+                <span><strong>Untimed practice</strong> — one question at a time</span>
+              </label>
+              {presets.map((p, i) => (
+                <label key={p.label} className="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 p-3 text-sm hover:border-slate-300">
+                  <input type="radio" checked={mode === i} onChange={() => setMode(i)} />
+                  <span><strong>Timed</strong> — {p.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
           <div>
             <label className="label">Topic</label>
             <select className="input" value={domain} onChange={(e) => setDomain(e.target.value)}>
@@ -208,43 +290,30 @@ export default function PracticeClient({
               ))}
             </select>
           </div>
-          <div>
-            <label className="label">Difficulty</label>
-            <select className="input" value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
-              <option value="all">Mixed</option>
-              <option value="easy">Easy</option>
-              <option value="medium">Medium</option>
-              <option value="hard">Hard</option>
-            </select>
-          </div>
-          <div>
-            <label className="label">Mode</label>
-            <div className="space-y-2">
-              <label className="flex items-center gap-2 text-sm">
-                <input type="radio" checked={mode === "untimed"} onChange={() => setMode("untimed")} />
-                Untimed practice
-              </label>
-              {presets.map((p, i) => (
-                <label key={p.label} className="flex items-center gap-2 text-sm">
-                  <input type="radio" checked={mode === i} onChange={() => setMode(i)} />
-                  Timed — {p.label}
-                </label>
-              ))}
-            </div>
-          </div>
           {mode === "untimed" && (
-            <div>
-              <label className="label">Number of questions</label>
-              <select className="input" value={count} onChange={(e) => setCount(Number(e.target.value))}>
-                {[5, 10, 15, 20].map((n) => (
-                  <option key={n} value={n}>{n} questions</option>
-                ))}
-              </select>
-            </div>
+            <>
+              <div>
+                <label className="label">Difficulty</label>
+                <select className="input" value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
+                  <option value="all">Mixed</option>
+                  <option value="easy">Easy</option>
+                  <option value="medium">Medium</option>
+                  <option value="hard">Hard</option>
+                </select>
+              </div>
+              <div>
+                <label className="label">Number of questions</label>
+                <select className="input" value={count} onChange={(e) => setCount(Number(e.target.value))}>
+                  {[5, 10, 15, 20].map((n) => (
+                    <option key={n} value={n}>{n} questions</option>
+                  ))}
+                </select>
+              </div>
+            </>
           )}
           {error && <p className="text-sm text-red-600">{error}</p>}
           <button className="btn-primary w-full" onClick={start} disabled={loading}>
-            {loading ? "Loading…" : "Start practice set"}
+            {loading ? "Loading…" : isDrill ? <>Start drill <span className="btn-arrow" aria-hidden>→</span></> : "Start practice set"}
           </button>
         </div>
       </div>
@@ -258,7 +327,7 @@ export default function PracticeClient({
       <div className="mx-auto max-w-2xl space-y-6">
         <div className="card text-center">
           <h1 className="text-3xl font-extrabold">Set complete 🎉</h1>
-          <p className="mt-4 text-5xl font-extrabold text-brand-700">{pct}%</p>
+          <p className="mt-4 text-5xl font-extrabold text-black">{pct}%</p>
           <p className="mt-2 text-slate-600">
             {correct} of {answers.length} correct
           </p>
@@ -290,6 +359,135 @@ export default function PracticeClient({
     );
   }
 
+  // ── Drill answering: all questions stacked, one click answers ──
+  if (isDrill) {
+    const answeredCount = Object.keys(drillAnswers).length;
+    const total = questions.length;
+    const done = total > 0 && answeredCount === total;
+    const correctCount = Object.values(drillAnswers).filter((a) => a.correct).length;
+    const [heading, sub] = drillHeading(correctCount, total);
+
+    return (
+      <div className="mx-auto max-w-2xl">
+        {shortNotice && (
+          <div className="mb-4 flex items-start justify-between gap-3 rounded-xl bg-amber-50 p-4 text-sm text-amber-800">
+            <p>{shortNotice}</p>
+            <button className="shrink-0 font-bold" onClick={() => setShortNotice(null)} aria-label="Dismiss">✕</button>
+          </div>
+        )}
+
+        {/* Sticky progress header */}
+        <div className="sticky top-[57px] z-30 -mx-4 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur">
+          <div className="mx-auto flex max-w-2xl items-center justify-between">
+            <p className="text-sm font-bold text-black">
+              {answeredCount} / {total} <span className="font-medium text-slate-500">answered</span>
+            </p>
+            <p className="text-sm font-medium text-slate-500">{subjectName}</p>
+          </div>
+          <div className="mx-auto mt-2 h-1.5 max-w-2xl overflow-hidden rounded-full bg-slate-200">
+            <div
+              className="h-full bg-black transition-all"
+              style={{ width: `${total ? (answeredCount / total) * 100 : 0}%` }}
+            />
+          </div>
+        </div>
+
+        <div className="space-y-5 pt-6">
+          {questions.map((qq, qi) => {
+            const da = drillAnswers[qq.id];
+            const answered = !!da;
+            const isMcq = !!qq.choices && qq.correctIndex !== null;
+            return (
+              <div
+                key={qq.id}
+                className={`rounded-2xl border-2 bg-white p-5 transition sm:p-6 ${
+                  answered ? (da.correct ? "border-green-500" : "border-red-400") : "border-slate-200"
+                }`}
+              >
+                <span className="inline-block rounded-full bg-slate-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-slate-500">
+                  Question {qi + 1}
+                </span>
+                <p className="mt-3 whitespace-pre-wrap text-lg leading-relaxed">{qq.prompt}</p>
+
+                {isMcq ? (
+                  <div className="mt-4 space-y-2">
+                    {qq.choices!.map((c, i) => {
+                      const isRight = answered && i === qq.correctIndex;
+                      const isWrongPick = answered && i === da.selected && !da.correct;
+                      return (
+                        <button
+                          key={i}
+                          disabled={answered}
+                          onClick={() => answerDrill(qq, i)}
+                          className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left transition ${
+                            isRight
+                              ? "border-green-500 bg-green-50 font-semibold"
+                              : isWrongPick
+                                ? "border-red-500 bg-red-50"
+                                : answered
+                                  ? "border-slate-200 opacity-70"
+                                  : "border-slate-200 hover:border-slate-400 hover:bg-slate-50"
+                          }`}
+                        >
+                          <span
+                            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
+                              isRight
+                                ? "bg-green-500 text-white"
+                                : isWrongPick
+                                  ? "bg-red-500 text-white"
+                                  : "bg-slate-100 text-slate-500"
+                            }`}
+                          >
+                            {String.fromCharCode(65 + i)}
+                          </span>
+                          <span>{c}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="mt-4 text-sm text-slate-500">This question needs a typed answer — use untimed mode for it.</p>
+                )}
+
+                {answered && (
+                  <div className={`mt-4 rounded-xl p-4 text-sm ${da.correct ? "bg-green-50" : "bg-red-50"}`}>
+                    <p className={`font-bold uppercase tracking-wide ${da.correct ? "text-green-700" : "text-red-700"}`}>
+                      {da.correct ? "Correct" : `Incorrect — the answer is ${qq.correctText}`}
+                    </p>
+                    <p className="mt-1 whitespace-pre-wrap text-slate-700">
+                      <strong>Explanation:</strong> {qq.explanation}
+                    </p>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+
+          {/* End-of-drill score card */}
+          {done && (
+            <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center">
+              <ScoreRing correct={correctCount} total={total} />
+              <h2 className="mt-4 text-3xl font-extrabold text-black">{heading}</h2>
+              <p className="mx-auto mt-2 max-w-md text-slate-600">{sub}</p>
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
+                <button className="btn-primary" onClick={start}>
+                  Next drill <span className="btn-arrow" aria-hidden>→</span>
+                </button>
+                <Link href="/practice" className="btn-secondary">
+                  More practice
+                </Link>
+                <Link href="/dashboard" className="btn-secondary">
+                  Dashboard
+                </Link>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ── Classic one-at-a-time answering (untimed + timed) ──
   if (!q) return <p>Loading…</p>;
   const isMcq = !!q.choices && q.correctIndex !== null;
   const lastAnswer = answers[answers.length - 1];
@@ -320,7 +518,7 @@ export default function PracticeClient({
         )}
       </div>
       <div className="h-2 overflow-hidden rounded-full bg-slate-200">
-        <div className="h-full bg-brand-600 transition-all" style={{ width: `${((index + (checked ? 1 : 0)) / questions.length) * 100}%` }} />
+        <div className="h-full bg-black transition-all" style={{ width: `${((index + (checked ? 1 : 0)) / questions.length) * 100}%` }} />
       </div>
 
       <div className="card space-y-5">
@@ -339,8 +537,8 @@ export default function PracticeClient({
                   className={`w-full rounded-xl border px-4 py-3 text-left transition ${
                     isRight ? "border-green-500 bg-green-50 font-semibold"
                     : isWrongPick ? "border-red-500 bg-red-50"
-                    : selected === i ? "border-brand-500 bg-brand-50"
-                    : "border-slate-200 hover:border-brand-300 hover:bg-slate-50"
+                    : selected === i ? "border-black bg-slate-100"
+                    : "border-slate-200 hover:border-slate-400 hover:bg-slate-50"
                   }`}
                 >
                   <span className="mr-2 font-bold text-slate-400">{String.fromCharCode(65 + i)}.</span> {c}
