@@ -34,6 +34,32 @@ type Student = {
   _count: { attempts: number };
 };
 
+type UnitReport = {
+  id: string;
+  name: string;
+  short: string;
+  attempts: number;
+  correct: number;
+  accuracy: number | null;
+  lastAt: string | null;
+};
+
+type RecentAttempt = {
+  id: string;
+  unitShort: string;
+  domain: string;
+  prompt: string;
+  correct: boolean;
+  timeMs: number | null;
+  createdAt: string;
+};
+
+type StudentReport = {
+  summary: { totalAttempts: number; totalCorrect: number; accuracy: number | null; lastAt: string | null };
+  units: UnitReport[];
+  recent: RecentAttempt[];
+};
+
 const emptyForm = {
   subject: "unit-1",
   domain: "",
@@ -53,6 +79,9 @@ export default function Admin() {
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
   const [confirmDeleteStudentId, setConfirmDeleteStudentId] = useState<string | null>(null);
+  const [reportStudentId, setReportStudentId] = useState<string | null>(null);
+  const [reports, setReports] = useState<Record<string, StudentReport>>({});
+  const [reportLoadingId, setReportLoadingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
@@ -165,6 +194,23 @@ export default function Admin() {
     await fetch(`/api/admin/students/${id}`, { method: "DELETE" });
     setConfirmDeleteStudentId(null);
     loadAll();
+  }
+
+  async function toggleReport(id: string) {
+    if (reportStudentId === id) {
+      setReportStudentId(null);
+      return;
+    }
+    setReportStudentId(id);
+    if (!reports[id]) {
+      setReportLoadingId(id);
+      const res = await fetch(`/api/admin/students/${id}/report`);
+      if (res.ok) {
+        const data = await res.json();
+        setReports((prev) => ({ ...prev, [id]: { summary: data.summary, units: data.units, recent: data.recent } }));
+      }
+      setReportLoadingId(null);
+    }
   }
 
   async function setInquiryStatus(id: string, status: string) {
@@ -318,6 +364,9 @@ export default function Admin() {
                 </span>
               </div>
               <div className="mt-3 flex flex-wrap gap-2">
+                <button className="btn-secondary !px-3 !py-1.5 text-sm" onClick={() => toggleReport(s.id)}>
+                  {reportStudentId === s.id ? "Hide report" : "View report"}
+                </button>
                 <button
                   className={`rounded-xl px-3 py-1.5 text-sm font-semibold ${s.isPaid ? "border border-slate-200 text-slate-600 hover:bg-slate-50" : "bg-brand-600 text-white hover:bg-brand-700"}`}
                   onClick={() => setStudentPaid(s.id, !s.isPaid)}
@@ -333,6 +382,64 @@ export default function Admin() {
                   <button className="rounded-xl border border-red-200 px-3 py-1.5 text-sm font-semibold text-red-600 hover:bg-red-50" onClick={() => setConfirmDeleteStudentId(s.id)}>Delete</button>
                 )}
               </div>
+              {reportStudentId === s.id && (
+                <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  {reportLoadingId === s.id && <p className="text-sm text-slate-500">Loading report…</p>}
+                  {reports[s.id] && (() => {
+                    const r = reports[s.id];
+                    return (
+                      <div className="space-y-4">
+                        <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
+                          <span><strong>{r.summary.totalAttempts}</strong> answered</span>
+                          <span><strong>{r.summary.accuracy !== null ? `${r.summary.accuracy}%` : "—"}</strong> overall accuracy</span>
+                          <span className="text-slate-500">
+                            Last active {r.summary.lastAt ? new Date(r.summary.lastAt).toLocaleString() : "—"}
+                          </span>
+                        </div>
+                        <div className="space-y-2">
+                          {r.units.map((u) => (
+                            <div key={u.id} className="text-sm">
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="font-semibold">{u.short}</span>
+                                <span className="text-slate-500">
+                                  {u.attempts === 0 ? "No attempts yet" : `${u.correct}/${u.attempts} · ${u.accuracy}%`}
+                                </span>
+                              </div>
+                              <div className="mt-1 h-2 overflow-hidden rounded-full bg-slate-200">
+                                <div
+                                  className={`h-full rounded-full ${u.accuracy === null ? "" : u.accuracy >= 70 ? "bg-green-500" : u.accuracy >= 40 ? "bg-amber-400" : "bg-red-400"}`}
+                                  style={{ width: `${u.accuracy ?? 0}%` }}
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        {r.recent.length > 0 && (
+                          <div>
+                            <p className="mb-2 text-sm font-bold">Recent attempts</p>
+                            <div className="max-h-64 space-y-1.5 overflow-y-auto">
+                              {r.recent.map((a) => (
+                                <div key={a.id} className="flex items-start gap-2 text-xs">
+                                  <span className={`mt-0.5 shrink-0 rounded-full px-2 py-0.5 font-bold ${a.correct ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"}`}>
+                                    {a.correct ? "✓" : "✗"}
+                                  </span>
+                                  <div className="min-w-0">
+                                    <p className="truncate text-slate-700">{a.prompt}</p>
+                                    <p className="text-slate-400">
+                                      {a.unitShort} · {a.domain} · {new Date(a.createdAt).toLocaleString()}
+                                      {a.timeMs != null ? ` · ${Math.round(a.timeMs / 1000)}s` : ""}
+                                    </p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
             </div>
           ))}
         </div>
