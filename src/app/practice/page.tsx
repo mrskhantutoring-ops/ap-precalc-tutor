@@ -134,7 +134,7 @@ function PracticeHubInner() {
               return (
                 <Link
                   key={sec.id}
-                  href={`/practice/${unitId}?section=${sec.id}`}
+                  href={`/practice/${unitId}/${sec.id}`}
                   className="group flex items-start justify-between gap-4 py-5"
                 >
                   <div className="min-w-0">

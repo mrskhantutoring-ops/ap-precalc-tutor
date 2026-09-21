@@ -8,6 +8,7 @@ type Question = {
   id: string;
   subject: string;
   section: string | null;
+  title: string | null;
   difficulty: string;
   prompt: string;
   choices: string[] | null;
@@ -78,6 +79,7 @@ type TimedTestSubmission = {
 const emptyForm = {
   subject: "unit-1",
   section: "",
+  title: "",
   difficulty: "medium",
   prompt: "",
   choicesText: "",
@@ -142,6 +144,7 @@ export default function Admin() {
     setForm({
       subject: q.subject,
       section: q.section ?? "",
+      title: q.title ?? "",
       difficulty: q.difficulty,
       prompt: q.prompt,
       choicesText: (q.choices ?? []).join("\n"),
@@ -159,6 +162,7 @@ export default function Admin() {
     const payload = {
       subject: form.subject,
       section: form.section,
+      title: form.title.trim() || null,
       difficulty: form.difficulty,
       prompt: form.prompt,
       choices,
@@ -305,6 +309,10 @@ export default function Admin() {
               </div>
             </div>
             <div>
+              <label className="label">Short title <span className="font-normal text-slate-500">(shown in the section question list)</span></label>
+              <input className="input" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="e.g. Average Rate of Change" />
+            </div>
+            <div>
               <label className="label">Prompt <span className="font-normal text-slate-500">{"(math: use LaTeX like \\(x^{2}\\), \\(\\frac{a}{b}\\), \\(\\sqrt{x}\\))"}</span></label>
               <textarea className="input min-h-24" required value={form.prompt} onChange={(e) => setForm({ ...form, prompt: e.target.value })} />
             </div>
@@ -348,7 +356,7 @@ export default function Admin() {
               <div key={q.id} className="card !p-4">
                 <div className="flex items-start justify-between gap-4">
                   <div className="text-sm">
-                    <p className="font-semibold">{q.subject} · {q.section ? sectionLabel(q.subject, q.section) : "—"} · {q.difficulty}</p>
+                    <p className="font-semibold">{q.subject} · {q.section ? sectionLabel(q.subject, q.section) : "—"} · {q.difficulty}{q.title ? ` · ${q.title}` : ""}</p>
                     <p className="mt-1 text-slate-600">{plainText(q.prompt).slice(0, 140)}{q.prompt.length > 140 ? "…" : ""}</p>
                     <p className="mt-1 text-slate-500">Answer: {plainText(q.correctText)}</p>
                   </div>
