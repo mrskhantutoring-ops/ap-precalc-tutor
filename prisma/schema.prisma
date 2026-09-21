@@ -34,6 +34,7 @@ model Session {
 
 model Question {
   id           String   @id @default(cuid())
+  slug         String?  @unique // stable key for seed sync (e.g. "unit-1-01"); null for legacy rows until backfilled
   subject      String   // sat-math | act-math | sat-reading-writing | act-english
   domain       String   // official content domain, e.g. "Algebra"
   difficulty   String   @default("medium") // easy | medium | hard

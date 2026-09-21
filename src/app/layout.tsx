@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { site, UNITS } from "@/lib/site";
@@ -13,6 +14,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
+        {/* MathJax: renders \(...\) LaTeX in question text as textbook-style math.
+            Free/open-source (Apache-2.0), loaded from the jsDelivr CDN. */}
+        <Script id="mathjax-config" strategy="beforeInteractive">
+          {`window.MathJax = { tex: { inlineMath: [['\\\\(','\\\\)']], displayMath: [['\\\\[','\\\\]']] } };`}
+        </Script>
+        <Script
+          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+          strategy="beforeInteractive"
+        />
         <Navbar />
         <main className="mx-auto max-w-6xl px-4 pb-20 pt-8">{children}</main>
         <footer className="bg-black text-slate-300">

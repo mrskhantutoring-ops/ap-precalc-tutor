@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import MathText from "@/components/MathText";
+import { plainText } from "@/lib/mathText";
 
 type Question = {
   id: string;
@@ -345,8 +347,8 @@ export default function PracticeClient({
                 <p className="text-sm font-semibold">
                   Q{i + 1} · {qq?.domain} {a.correct ? "✅" : "❌"}
                 </p>
-                <p className="mt-1 text-sm text-slate-600">{qq?.prompt.slice(0, 120)}…</p>
-                {!a.correct && <p className="mt-2 text-sm text-slate-600"><strong>Answer:</strong> {qq?.correctText}</p>}
+                <p className="mt-1 text-sm text-slate-600">{plainText(qq?.prompt ?? "").slice(0, 120)}…</p>
+                {!a.correct && <p className="mt-2 text-sm text-slate-600"><strong>Answer:</strong> <MathText text={qq?.correctText ?? ""} /></p>}
               </div>
             );
           })}
@@ -407,7 +409,7 @@ export default function PracticeClient({
                 <span className="inline-block rounded-full bg-slate-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-slate-500">
                   Question {qi + 1}
                 </span>
-                <p className="mt-3 whitespace-pre-wrap text-lg leading-relaxed">{qq.prompt}</p>
+                <p className="mt-3 text-xl leading-relaxed md:text-2xl"><MathText text={qq.prompt} /></p>
 
                 {isMcq ? (
                   <div className="mt-4 space-y-2">
@@ -419,7 +421,7 @@ export default function PracticeClient({
                           key={i}
                           disabled={answered}
                           onClick={() => answerDrill(qq, i)}
-                          className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left transition ${
+                          className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left text-lg transition ${
                             isRight
                               ? "border-green-500 bg-green-50 font-semibold"
                               : isWrongPick
@@ -440,7 +442,7 @@ export default function PracticeClient({
                           >
                             {String.fromCharCode(65 + i)}
                           </span>
-                          <span>{c}</span>
+                          <MathText text={c} />
                         </button>
                       );
                     })}
@@ -450,12 +452,12 @@ export default function PracticeClient({
                 )}
 
                 {answered && (
-                  <div className={`mt-4 rounded-xl p-4 text-sm ${da.correct ? "bg-green-50" : "bg-red-50"}`}>
+                  <div className={`mt-4 rounded-xl p-4 ${da.correct ? "bg-green-50" : "bg-red-50"}`}>
                     <p className={`font-bold uppercase tracking-wide ${da.correct ? "text-green-700" : "text-red-700"}`}>
-                      {da.correct ? "Correct" : `Incorrect — the answer is ${qq.correctText}`}
+                      {da.correct ? "Correct" : (<>Incorrect — the answer is <MathText text={qq.correctText} /></>)}
                     </p>
-                    <p className="mt-1 whitespace-pre-wrap text-slate-700">
-                      <strong>Explanation:</strong> {qq.explanation}
+                    <p className="mt-1 text-base text-slate-700">
+                      <strong>Explanation:</strong> <MathText text={qq.explanation} />
                     </p>
                   </div>
                 )}
@@ -522,7 +524,7 @@ export default function PracticeClient({
       </div>
 
       <div className="card space-y-5">
-        <p className="whitespace-pre-wrap text-lg leading-relaxed">{q.prompt}</p>
+        <p className="text-xl leading-relaxed md:text-2xl"><MathText text={q.prompt} /></p>
 
         {isMcq ? (
           <div className="space-y-2">
@@ -534,14 +536,14 @@ export default function PracticeClient({
                   key={i}
                   disabled={checked}
                   onClick={() => setSelected(i)}
-                  className={`w-full rounded-xl border px-4 py-3 text-left transition ${
+                  className={`w-full rounded-xl border px-4 py-3 text-left text-lg transition ${
                     isRight ? "border-green-500 bg-green-50 font-semibold"
                     : isWrongPick ? "border-red-500 bg-red-50"
                     : selected === i ? "border-black bg-slate-100"
                     : "border-slate-200 hover:border-slate-400 hover:bg-slate-50"
                   }`}
                 >
-                  <span className="mr-2 font-bold text-slate-400">{String.fromCharCode(65 + i)}.</span> {c}
+                  <span className="mr-2 font-bold text-slate-400">{String.fromCharCode(65 + i)}.</span> <MathText text={c} />
                 </button>
               );
             })}
@@ -558,16 +560,16 @@ export default function PracticeClient({
             />
             {checked && (
               <p className={`mt-2 text-sm font-semibold ${wasCorrect ? "text-green-700" : "text-red-700"}`}>
-                {wasCorrect ? "✅ Correct!" : `❌ The correct answer is ${q.correctText}.`}
+                {wasCorrect ? "✅ Correct!" : (<>❌ The correct answer is <MathText text={q.correctText} />.</>)}
               </p>
             )}
           </div>
         )}
 
         {checked && (
-          <div className="rounded-xl bg-slate-50 p-4 text-sm text-slate-700">
+          <div className="rounded-xl bg-slate-50 p-4 text-base text-slate-700">
             <p className="font-bold text-slate-900">Explanation</p>
-            <p className="mt-1 whitespace-pre-wrap">{q.explanation}</p>
+            <p className="mt-1"><MathText text={q.explanation} /></p>
           </div>
         )}
 

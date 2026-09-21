@@ -21,7 +21,7 @@
   "private": true,
   "name": "ap-precalc-tutor",
   "scripts": {
-    "build": "prisma generate && prisma db push --accept-data-loss && node prisma/seed-missing.mjs && next build",
+    "build": "prisma generate && prisma db push --accept-data-loss && node prisma/sync-questions.mjs && next build",
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
     "db:seed": "node prisma/seed.mjs",

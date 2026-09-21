@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import PaidGate from "@/components/PaidGate";
+import { plainText } from "@/lib/mathText";
 
 type Progress = {
   totals: { attempts: number; correct: number; accuracy: number };
@@ -120,7 +121,7 @@ function DashboardInner() {
             <span className="mr-2">{r.correct ? "✅" : "❌"}</span>
             <span className="font-semibold">{r.question.subject}</span>
             <span className="text-slate-500"> · {r.question.domain} · </span>
-            <span className="text-slate-600">{r.question.prompt.slice(0, 80)}…</span>
+            <span className="text-slate-600">{plainText(r.question.prompt).slice(0, 80)}…</span>
             <span className="text-slate-400"> · {new Date(r.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}</span>
           </div>
         ))}

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { SUBJECTS } from "@/lib/site";
+import { plainText } from "@/lib/mathText";
 
 type Question = {
   id: string;
@@ -304,7 +305,7 @@ export default function Admin() {
               </div>
             </div>
             <div>
-              <label className="label">Prompt</label>
+              <label className="label">Prompt <span className="font-normal text-slate-500">{"(math: use LaTeX like \\(x^{2}\\), \\(\\frac{a}{b}\\), \\(\\sqrt{x}\\))"}</span></label>
               <textarea className="input min-h-24" required value={form.prompt} onChange={(e) => setForm({ ...form, prompt: e.target.value })} />
             </div>
             <div>
@@ -337,8 +338,8 @@ export default function Admin() {
                 <div className="flex items-start justify-between gap-4">
                   <div className="text-sm">
                     <p className="font-semibold">{q.subject} · {q.domain} · {q.difficulty}</p>
-                    <p className="mt-1 text-slate-600">{q.prompt.slice(0, 140)}{q.prompt.length > 140 ? "…" : ""}</p>
-                    <p className="mt-1 text-slate-500">Answer: {q.correctText}</p>
+                    <p className="mt-1 text-slate-600">{plainText(q.prompt).slice(0, 140)}{q.prompt.length > 140 ? "…" : ""}</p>
+                    <p className="mt-1 text-slate-500">Answer: {plainText(q.correctText)}</p>
                   </div>
                   <div className="flex shrink-0 gap-2">
                     <button className="btn-secondary !px-3 !py-1.5 text-sm" onClick={() => fillForm(q)}>Edit</button>
@@ -438,7 +439,7 @@ export default function Admin() {
                                     {a.correct ? "✓" : "✗"}
                                   </span>
                                   <div className="min-w-0">
-                                    <p className="truncate text-slate-700">{a.prompt}</p>
+                                    <p className="truncate text-slate-700">{plainText(a.prompt)}</p>
                                     <p className="text-slate-400">
                                       {a.unitShort} · {a.domain} · {new Date(a.createdAt).toLocaleString()}
                                       {a.timeMs != null ? ` · ${Math.round(a.timeMs / 1000)}s` : ""}
