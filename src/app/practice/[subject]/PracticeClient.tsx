@@ -160,13 +160,25 @@ export default function PracticeClient({
     return () => clearInterval(id);
   }, [phase, timed, finishOnce]);
 
-  async function start() {
+  // "Next:" redirect for drills — moves the student to the next topic in the unit
+  // instead of replaying the same small question pool on a loop.
+  const nextDomain = domain === "all" ? domains[0] : domains[domains.indexOf(domain) + 1] ?? "all";
+  const nextDrillLabel = nextDomain === "all" ? "Mixed review drill (all topics)" : `${nextDomain} drill`;
+  function goNextDrill() {
+    setDomain(nextDomain);
+    start(nextDomain);
+  }
+
+  async function start(domainOverride?: string) {
     setLoading(true);
     setError(null);
     try {
       const requested = isDrill ? 5 : timed ? TIMED_PRESETS[subjectId][mode as number].count : count;
       const params = new URLSearchParams({ subject: subjectId, limit: String(requested) });
-      if (domain !== "all") params.set("domain", domain);
+      // NB: start is also used directly as an onClick handler, so the first
+      // argument may be a click event — only honor string overrides.
+      const d = typeof domainOverride === "string" ? domainOverride : domain;
+      if (d !== "all") params.set("domain", d);
       if (difficulty !== "all" && !isDrill) params.set("difficulty", difficulty);
       const res = await fetch(`/api/questions?${params}`);
       if (!res.ok) throw new Error("Could not load questions.");
@@ -314,7 +326,7 @@ export default function PracticeClient({
             </>
           )}
           {error && <p className="text-sm text-red-600">{error}</p>}
-          <button className="btn-primary w-full" onClick={start} disabled={loading}>
+          <button className="btn-primary w-full" onClick={() => start()} disabled={loading}>
             {loading ? "Loading…" : isDrill ? <>Start drill <span className="btn-arrow" aria-hidden>→</span></> : "Start practice set"}
           </button>
         </div>
@@ -471,9 +483,13 @@ export default function PracticeClient({
               <ScoreRing correct={correctCount} total={total} />
               <h2 className="mt-4 text-3xl font-extrabold text-black">{heading}</h2>
               <p className="mx-auto mt-2 max-w-md text-slate-600">{sub}</p>
-              <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
-                <button className="btn-primary" onClick={start}>
-                  Next drill <span className="btn-arrow" aria-hidden>→</span>
+              <p className="mt-6 text-lg font-bold text-black">Next: {nextDrillLabel}</p>
+              <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:justify-center">
+                <button className="btn-primary" onClick={goNextDrill}>
+                  Next <span className="btn-arrow" aria-hidden>»</span>
+                </button>
+                <button className="btn-secondary" onClick={() => start()}>
+                  Replay this topic
                 </button>
                 <Link href="/practice" className="btn-secondary">
                   More practice
