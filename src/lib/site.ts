@@ -38,7 +38,7 @@ export const UNITS = [
     short: "Unit 1",
     blurb: "College Board weighting 30–40% · polynomial and rational functions",
     icon: "📈",
-    count: 20,
+    count: 45,
     tint: { bg: "#FEFCE8", border: "#FEF08A", chipBg: "#FEF08A", chipText: "#A16207" },
   },
   {
@@ -47,7 +47,7 @@ export const UNITS = [
     short: "Unit 2",
     blurb: "College Board weighting 25–40% · exponential and logarithmic functions",
     icon: "📊",
-    count: 22,
+    count: 62,
     tint: { bg: "#F0F9FF", border: "#BAE6FD", chipBg: "#BAE6FD", chipText: "#0369A1" },
   },
   {
@@ -56,7 +56,7 @@ export const UNITS = [
     short: "Unit 3",
     blurb: "College Board weighting 30–35% · trig, sinusoidal and polar functions",
     icon: "🔺",
-    count: 21,
+    count: 36,
     tint: { bg: "#F5F3FF", border: "#DDD6FE", chipBg: "#DDD6FE", chipText: "#6D28D9" },
   },
   {
@@ -65,7 +65,7 @@ export const UNITS = [
     short: "Unit 4",
     blurb: "Course unit · parametric functions, vectors, matrices (not on the AP exam)",
     icon: "🧭",
-    count: 16,
+    count: 51,
     tint: { bg: "#fdedf2", border: "#f2cad7", chipBg: "#FBCFE8", chipText: "#BE185D" },
   },
 ] as const;
