@@ -20,6 +20,7 @@ model User {
   createdAt    DateTime  @default(now())
   sessions     Session[]
   attempts     Attempt[]
+  timedSubmissions TimedSubmission[]
 }
 
 model Session {
@@ -68,4 +69,25 @@ model Inquiry {
   message   String   @db.Text
   status    String   @default("new") // new | contacted | closed
   createdAt DateTime @default(now())
+}
+
+// Free-response timed test submissions (e.g. teacher-assigned worksheet tests).
+// One row per student per test. Drafts are auto-saved during the test; once
+// final=true the row is locked and no further edits are accepted.
+model TimedSubmission {
+  id         String   @id @default(cuid())
+  testId     String   // e.g. "unit1-section-1-5"
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  answers    Json     @default("{}") // { "q1": "...", "q2": "...", ... }
+  startedAt  DateTime @default(now())
+  final      Boolean  @default(false)
+  finishedAt DateTime?
+  timeMs     Int?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([testId, userId])
+  @@index([userId])
+  @@index([testId])
 }

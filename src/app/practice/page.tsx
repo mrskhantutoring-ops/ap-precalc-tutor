@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { SUBJECTS } from "@/lib/site";
+import { timedTestList } from "@/lib/timedTests";
 import PaidGate from "@/components/PaidGate";
+
+const timedTests = timedTestList();
 
 export default function PracticeHub() {
   return (
@@ -32,6 +35,27 @@ export default function PracticeHub() {
             </div>
           ))}
         </div>
+        {timedTests.length > 0 && (
+          <div className="space-y-3">
+            <h2 className="text-xl font-extrabold tracking-tight">Timed tests</h2>
+            <p className="-mt-2 text-sm text-slate-600">
+              Teacher-assigned worksheet tests. The clock can't be paused — your work auto-saves and the test locks when time runs out.
+            </p>
+            {timedTests.map((t) => (
+              <div key={t.id} className="card flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="font-bold text-black">{t.title}</p>
+                  <p className="mt-1 text-sm text-slate-600">
+                    ⏱ {t.minutes} minutes · 📝 {t.questions.length} free-response questions
+                  </p>
+                </div>
+                <Link href={`/practice/timed/${t.id}`} className="btn-primary shrink-0">
+                  Open test <span className="btn-arrow" aria-hidden>↗</span>
+                </Link>
+              </div>
+            ))}
+          </div>
+        )}
         <div className="card bg-slate-50">
           <h2 className="font-bold text-black">How drills & timed sets work</h2>
           <p className="mt-1 text-sm text-slate-600">

@@ -58,6 +58,20 @@ type StudentReport = {
   summary: { totalAttempts: number; totalCorrect: number; accuracy: number | null; lastAt: string | null };
   units: UnitReport[];
   recent: RecentAttempt[];
+  timedTests?: TimedTestSubmission[];
+};
+
+type TimedTestSubmission = {
+  id: string;
+  testId: string;
+  title: string;
+  questionCount: number;
+  answeredCount: number;
+  final: boolean;
+  answers: Record<string, string>;
+  startedAt: string;
+  finishedAt: string | null;
+  timeMs: number | null;
 };
 
 const emptyForm = {
@@ -431,6 +445,38 @@ export default function Admin() {
                                     </p>
                                   </div>
                                 </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {(r.timedTests ?? []).length > 0 && (
+                          <div>
+                            <p className="mb-2 text-sm font-bold">Timed tests</p>
+                            <div className="space-y-2">
+                              {(r.timedTests ?? []).map((t) => (
+                                <details key={t.id} className="rounded-xl border border-slate-200 bg-white p-3 text-sm">
+                                  <summary className="cursor-pointer font-semibold">
+                                    {t.title}
+                                    <span className={`ml-2 rounded-full px-2 py-0.5 text-xs font-bold ${t.final ? "bg-slate-100 text-slate-600" : "bg-amber-100 text-amber-800"}`}>
+                                      {t.final ? "Submitted" : "In progress"}
+                                    </span>
+                                  </summary>
+                                  <p className="mt-1 text-xs text-slate-400">
+                                    Started {new Date(t.startedAt).toLocaleString()}
+                                    {t.timeMs != null ? ` · time used ${Math.floor(t.timeMs / 60000)}:${String(Math.floor((t.timeMs % 60000) / 1000)).padStart(2, "0")}` : ""}
+                                    {" · "}{t.answeredCount}/{t.questionCount} answered
+                                  </p>
+                                  <div className="mt-2 max-h-72 space-y-2 overflow-y-auto">
+                                    {Array.from({ length: t.questionCount }, (_, i) => `q${i + 1}`).map((key) => (
+                                      <div key={key} className="rounded-lg bg-slate-50 p-2.5">
+                                        <p className="text-xs font-bold text-slate-500">Question {key.slice(1)}</p>
+                                        <p className="mt-0.5 whitespace-pre-wrap text-slate-700">
+                                          {t.answers?.[key]?.trim() ? t.answers[key] : <span className="italic text-slate-400">(no answer)</span>}
+                                        </p>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </details>
                               ))}
                             </div>
                           </div>

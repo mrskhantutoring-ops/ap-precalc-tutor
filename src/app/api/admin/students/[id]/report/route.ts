@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { isAdminCookieValid } from "@/lib/auth";
 import { UNITS } from "@/lib/site";
+import { timedTestById } from "@/lib/timedTests";
 
 export const dynamic = "force-dynamic";
 
@@ -69,6 +70,30 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     };
   });
 
+  const timed = await db.timedSubmission.findMany({
+    where: { userId: params.id },
+    orderBy: { startedAt: "desc" },
+  });
+  const timedTests = timed.map((t) => {
+    const test = timedTestById(t.testId);
+    const count = test?.questions.length ?? 0;
+    const answeredCount = Object.values((t.answers ?? {}) as Record<string, unknown>).filter(
+      (v) => typeof v === "string" && v.trim()
+    ).length;
+    return {
+      id: t.id,
+      testId: t.testId,
+      title: test?.title ?? t.testId,
+      questionCount: count,
+      answeredCount,
+      final: t.final,
+      answers: t.answers as Record<string, string>,
+      startedAt: t.startedAt.toISOString(),
+      finishedAt: t.finishedAt?.toISOString() ?? null,
+      timeMs: t.timeMs ?? null,
+    };
+  });
+
   return NextResponse.json({
     student,
     summary: {
@@ -79,5 +104,6 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     },
     units,
     recent,
+    timedTests,
   });
 }
