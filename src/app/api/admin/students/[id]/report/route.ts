@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { isAdminCookieValid } from "@/lib/auth";
-import { UNITS } from "@/lib/site";
+import { UNITS, sectionLabel } from "@/lib/site";
 import { timedTestById } from "@/lib/timedTests";
 
 export const dynamic = "force-dynamic";
@@ -27,7 +27,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     where: { userId: params.id },
     orderBy: { createdAt: "desc" },
     include: {
-      question: { select: { subject: true, domain: true, prompt: true } },
+      question: { select: { subject: true, section: true, prompt: true } },
     },
   });
 
@@ -62,7 +62,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     return {
       id: a.id,
       unitShort: unit?.short ?? a.question.subject,
-      domain: a.question.domain,
+      section: a.question.section ? sectionLabel(a.question.subject, a.question.section) : null,
       prompt: a.question.prompt,
       correct: a.correct,
       timeMs: a.timeMs,

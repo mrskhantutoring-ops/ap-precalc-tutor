@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
 
   const subject = String(body?.subject ?? "").trim();
-  const domain = String(body?.domain ?? "").trim();
+  const section = String(body?.section ?? "").trim();
   const difficulty = String(body?.difficulty ?? "medium").trim();
   const prompt = String(body?.prompt ?? "").trim();
   const explanation = String(body?.explanation ?? "").trim();
@@ -29,8 +29,8 @@ export async function POST(req: NextRequest) {
   const choices = Array.isArray(body?.choices) && body.choices.length ? body.choices.map(String) : null;
   const correctIndex = choices !== null && Number.isInteger(body?.correctIndex) ? body.correctIndex : null;
 
-  if (!subject || !domain || !prompt || !explanation || !correctText) {
-    return NextResponse.json({ error: "subject, domain, prompt, explanation, and correctText are required." }, { status: 400 });
+  if (!subject || !section || !prompt || !explanation || !correctText) {
+    return NextResponse.json({ error: "subject, section, prompt, explanation, and correctText are required." }, { status: 400 });
   }
   if (choices && (correctIndex === null || correctIndex < 0 || correctIndex >= choices.length)) {
     return NextResponse.json({ error: "correctIndex must be a valid 0-based index into choices." }, { status: 400 });
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
   }
 
   const q = await db.question.create({
-    data: { subject, domain, difficulty, prompt, choices: choices ?? undefined, correctIndex, correctText, explanation },
+    data: { subject, section, difficulty, prompt, choices: choices ?? undefined, correctIndex, correctText, explanation },
   });
   return NextResponse.json({ ok: true, question: q });
 }

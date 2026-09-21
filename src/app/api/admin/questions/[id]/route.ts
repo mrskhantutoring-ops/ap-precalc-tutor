@@ -14,7 +14,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   const body = await req.json().catch(() => null);
 
   const data: Record<string, unknown> = {};
-  for (const k of ["subject", "domain", "difficulty", "prompt", "explanation", "correctText"]) {
+  for (const k of ["subject", "section", "difficulty", "prompt", "explanation", "correctText"]) {
     if (typeof body?.[k] === "string") data[k] = body[k];
   }
   if (body?.choices === null) {

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { site, UNITS } from "@/lib/site";
+import { site, UNITS, sectionsByUnit } from "@/lib/site";
 
 const faqs = [
   {
@@ -77,9 +77,9 @@ export default function Home() {
               <h3 className="mt-1 text-xl font-bold text-black">{s.short}</h3>
               <p className="mt-1 text-sm text-slate-600">{s.blurb}</p>
               <div className="mt-3 flex flex-wrap gap-1.5">
-                {s.domains.slice(0, 3).map((d) => (
-                  <span key={d} className="rounded-full bg-white/70 px-2.5 py-0.5 text-xs font-medium text-slate-600">
-                    {d}
+                {sectionsByUnit(s.id).slice(0, 3).map((sec) => (
+                  <span key={sec.id} className="rounded-full bg-white/70 px-2.5 py-0.5 text-xs font-medium text-slate-600">
+                    {sec.id} | {sec.title}
                   </span>
                 ))}
               </div>

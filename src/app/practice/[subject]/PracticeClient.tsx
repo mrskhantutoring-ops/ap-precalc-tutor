@@ -8,7 +8,7 @@ import { plainText } from "@/lib/mathText";
 type Question = {
   id: string;
   subject: string;
-  domain: string;
+  section: string | null;
   difficulty: string;
   prompt: string;
   choices: string[] | null;
@@ -78,14 +78,16 @@ function drillHeading(correct: number, total: number): [string, string] {
 export default function PracticeClient({
   subjectId,
   subjectName,
-  domains,
+  sections,
+  initialSection,
 }: {
   subjectId: string;
   subjectName: string;
-  domains: string[];
+  sections: { id: string; title: string }[];
+  initialSection?: string;
 }) {
   const [phase, setPhase] = useState<Phase>("setup");
-  const [domain, setDomain] = useState<string>("all");
+  const [section, setSection] = useState<string>(initialSection ?? "all");
   const [difficulty, setDifficulty] = useState<string>("all");
   const [mode, setMode] = useState<Mode>("drill");
   const [count, setCount] = useState(10);
@@ -162,14 +164,16 @@ export default function PracticeClient({
 
   // "Next:" redirect for drills — moves the student to the next topic in the unit
   // instead of replaying the same small question pool on a loop.
-  const nextDomain = domain === "all" ? domains[0] : domains[domains.indexOf(domain) + 1] ?? "all";
-  const nextDrillLabel = nextDomain === "all" ? "Mixed review drill (all topics)" : `${nextDomain} drill`;
+  const sectionIds = sections.map((s) => s.id);
+  const nextSection = section === "all" ? sectionIds[0] : sectionIds[sectionIds.indexOf(section) + 1] ?? "all";
+  const nextTitle = sections.find((s) => s.id === nextSection)?.title;
+  const nextDrillLabel = nextSection === "all" ? "Mixed review drill (all sections)" : `${nextSection} | ${nextTitle} drill`;
   function goNextDrill() {
-    setDomain(nextDomain);
-    start(nextDomain);
+    setSection(nextSection);
+    start(nextSection);
   }
 
-  async function start(domainOverride?: string) {
+  async function start(sectionOverride?: string) {
     setLoading(true);
     setError(null);
     try {
@@ -177,8 +181,8 @@ export default function PracticeClient({
       const params = new URLSearchParams({ subject: subjectId, limit: String(requested) });
       // NB: start is also used directly as an onClick handler, so the first
       // argument may be a click event — only honor string overrides.
-      const d = typeof domainOverride === "string" ? domainOverride : domain;
-      if (d !== "all") params.set("domain", d);
+      const d = typeof sectionOverride === "string" ? sectionOverride : section;
+      if (d !== "all") params.set("section", d);
       if (difficulty !== "all" && !isDrill) params.set("difficulty", difficulty);
       const res = await fetch(`/api/questions?${params}`);
       if (!res.ok) throw new Error("Could not load questions.");
@@ -296,11 +300,11 @@ export default function PracticeClient({
             </div>
           </div>
           <div>
-            <label className="label">Topic</label>
-            <select className="input" value={domain} onChange={(e) => setDomain(e.target.value)}>
-              <option value="all">All topics</option>
-              {domains.map((d) => (
-                <option key={d} value={d}>{d}</option>
+            <label className="label">Section</label>
+            <select className="input" value={section} onChange={(e) => setSection(e.target.value)}>
+              <option value="all">All sections</option>
+              {sections.map((s) => (
+                <option key={s.id} value={s.id}>{s.id} | {s.title}</option>
               ))}
             </select>
           </div>
@@ -357,7 +361,7 @@ export default function PracticeClient({
             return (
               <div key={a.id + i} className={`card !p-4 ${a.correct ? "border-green-200" : "border-red-200"}`}>
                 <p className="text-sm font-semibold">
-                  Q{i + 1} · {qq?.domain} {a.correct ? "✅" : "❌"}
+                  Q{i + 1}{qq?.section ? ` · ${qq.section}` : ""} {a.correct ? "✅" : "❌"}
                 </p>
                 <p className="mt-1 text-sm text-slate-600">{plainText(qq?.prompt ?? "").slice(0, 120)}…</p>
                 {!a.correct && <p className="mt-2 text-sm text-slate-600"><strong>Answer:</strong> <MathText text={qq?.correctText ?? ""} /></p>}
@@ -489,7 +493,7 @@ export default function PracticeClient({
                   Next <span className="btn-arrow" aria-hidden>»</span>
                 </button>
                 <button className="btn-secondary" onClick={() => start()}>
-                  Replay this topic
+                  Replay this section
                 </button>
                 <Link href="/practice" className="btn-secondary">
                   More practice
@@ -510,6 +514,7 @@ export default function PracticeClient({
   const isMcq = !!q.choices && q.correctIndex !== null;
   const lastAnswer = answers[answers.length - 1];
   const wasCorrect = checked && lastAnswer?.id === q.id && lastAnswer.correct;
+  const qSectionTitle = q.section ? sections.find((s) => s.id === q.section)?.title : null;
 
   return (
     <div className="mx-auto max-w-2xl space-y-5">
@@ -527,7 +532,7 @@ export default function PracticeClient({
       )}
       <div className="flex items-center justify-between">
         <p className="text-sm font-semibold text-slate-500">
-          Question {index + 1} of {questions.length} · {q.domain} · {q.difficulty}
+          Question {index + 1} of {questions.length}{q.section ? ` · ${q.section}${qSectionTitle ? ` | ${qSectionTitle}` : ""} · ` : " · "}{q.difficulty}
         </p>
         {timed && secondsLeft !== null && (
           <p className={`rounded-full px-4 py-1.5 font-mono font-bold ${secondsLeft < 60 ? "bg-red-100 text-red-700" : secondsLeft < 300 ? "bg-amber-100 text-amber-800" : "bg-slate-100 text-slate-700"}`}>

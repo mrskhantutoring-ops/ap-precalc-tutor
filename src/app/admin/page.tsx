@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { SUBJECTS } from "@/lib/site";
+import { SUBJECTS, sectionsByUnit, sectionLabel } from "@/lib/site";
 import { plainText } from "@/lib/mathText";
 
 type Question = {
   id: string;
   subject: string;
-  domain: string;
+  section: string | null;
   difficulty: string;
   prompt: string;
   choices: string[] | null;
@@ -48,7 +48,7 @@ type UnitReport = {
 type RecentAttempt = {
   id: string;
   unitShort: string;
-  domain: string;
+  section: string | null;
   prompt: string;
   correct: boolean;
   timeMs: number | null;
@@ -77,7 +77,7 @@ type TimedTestSubmission = {
 
 const emptyForm = {
   subject: "unit-1",
-  domain: "",
+  section: "",
   difficulty: "medium",
   prompt: "",
   choicesText: "",
@@ -141,7 +141,7 @@ export default function Admin() {
     setEditingId(q.id);
     setForm({
       subject: q.subject,
-      domain: q.domain,
+      section: q.section ?? "",
       difficulty: q.difficulty,
       prompt: q.prompt,
       choicesText: (q.choices ?? []).join("\n"),
@@ -158,7 +158,7 @@ export default function Admin() {
     const choices = form.choicesText.trim() ? form.choicesText.split("\n").map((s) => s.trim()).filter(Boolean) : null;
     const payload = {
       subject: form.subject,
-      domain: form.domain || "General",
+      section: form.section,
       difficulty: form.difficulty,
       prompt: form.prompt,
       choices,
@@ -172,7 +172,7 @@ export default function Admin() {
       body: JSON.stringify(payload),
     });
     if (!res.ok) {
-      setMsg("Save failed — check all fields (for multiple-choice, correctIndex is 0-based).");
+      setMsg("Save failed — check all fields (for multiple-choice, pick the correct choice from the dropdown).");
       return;
     }
     setForm(emptyForm);
@@ -257,7 +257,7 @@ export default function Admin() {
       </div>
     );
 
-  const domains = SUBJECTS.find((s) => s.id === form.subject)?.domains ?? [];
+  const sections = sectionsByUnit(form.subject);
 
   return (
     <div className="space-y-6">
@@ -286,15 +286,15 @@ export default function Admin() {
             <div className="grid gap-4 sm:grid-cols-3">
               <div>
                 <label className="label">Subject</label>
-                <select className="input" value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value, domain: "" })}>
+                <select className="input" value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value, section: "" })}>
                   {SUBJECTS.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
                 </select>
               </div>
               <div>
-                <label className="label">Domain</label>
-                <select className="input" value={form.domain} onChange={(e) => setForm({ ...form, domain: e.target.value })}>
+                <label className="label">Section</label>
+                <select className="input" required value={form.section} onChange={(e) => setForm({ ...form, section: e.target.value })}>
                   <option value="">Select…</option>
-                  {domains.map((d) => <option key={d}>{d}</option>)}
+                  {sections.map((sec) => <option key={sec.id} value={sec.id}>{sec.id} | {sec.title}</option>)}
                 </select>
               </div>
               <div>
@@ -314,8 +314,19 @@ export default function Admin() {
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="label">Correct choice index (0-based, MCQ only)</label>
-                <input className="input" value={form.correctIndex} onChange={(e) => setForm({ ...form, correctIndex: e.target.value })} placeholder="1" />
+                <label className="label">Correct choice (MCQ only)</label>
+                <select
+                  className="input"
+                  value={form.correctIndex}
+                  onChange={(e) => setForm({ ...form, correctIndex: e.target.value })}
+                >
+                  <option value="">Select…</option>
+                  {form.choicesText.split("\n").map((s) => s.trim()).filter(Boolean).map((c, i) => (
+                    <option key={i} value={String(i)}>
+                      {String.fromCharCode(65 + i)} — {c.slice(0, 60)}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="label">Correct answer text (also used to grade grid-ins)</label>
@@ -337,7 +348,7 @@ export default function Admin() {
               <div key={q.id} className="card !p-4">
                 <div className="flex items-start justify-between gap-4">
                   <div className="text-sm">
-                    <p className="font-semibold">{q.subject} · {q.domain} · {q.difficulty}</p>
+                    <p className="font-semibold">{q.subject} · {q.section ? sectionLabel(q.subject, q.section) : "—"} · {q.difficulty}</p>
                     <p className="mt-1 text-slate-600">{plainText(q.prompt).slice(0, 140)}{q.prompt.length > 140 ? "…" : ""}</p>
                     <p className="mt-1 text-slate-500">Answer: {plainText(q.correctText)}</p>
                   </div>
@@ -441,7 +452,7 @@ export default function Admin() {
                                   <div className="min-w-0">
                                     <p className="truncate text-slate-700">{plainText(a.prompt)}</p>
                                     <p className="text-slate-400">
-                                      {a.unitShort} · {a.domain} · {new Date(a.createdAt).toLocaleString()}
+                                      {a.unitShort}{a.section ? ` · ${a.section}` : ""} · {new Date(a.createdAt).toLocaleString()}
                                       {a.timeMs != null ? ` · ${Math.round(a.timeMs / 1000)}s` : ""}
                                     </p>
                                   </div>

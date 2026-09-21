@@ -8,8 +8,8 @@ import { plainText } from "@/lib/mathText";
 type Progress = {
   totals: { attempts: number; correct: number; accuracy: number };
   bySubject: { subject: string; attempts: number; correct: number; accuracy: number }[];
-  byDomain: { subject: string; domain: string; attempts: number; correct: number; accuracy: number }[];
-  recent: { id: string; correct: boolean; createdAt: string; question: { subject: string; domain: string; prompt: string } }[];
+  sections: { subject: string; subjectShort: string; section: string; label: string; attempts: number; correct: number; accuracy: number | null }[];
+  recent: { id: string; correct: boolean; createdAt: string; question: { subject: string; section: string | null; prompt: string } }[];
 };
 
 export default function Dashboard() {
@@ -97,14 +97,14 @@ function DashboardInner() {
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-xl font-bold">By topic <span className="text-sm font-normal text-slate-500">(drill your reds first)</span></h2>
+        <h2 className="text-xl font-bold">By section <span className="text-sm font-normal text-slate-500">(drill your reds first)</span></h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {data.byDomain.map((d) => (
-            <div key={d.subject + d.domain} className="card !p-4">
-              <p className="text-xs text-slate-500">{d.subject}</p>
+          {data.sections.filter((d) => d.attempts > 0).sort((a, b) => (a.accuracy ?? 0) - (b.accuracy ?? 0)).map((d) => (
+            <div key={d.subject + d.section} className="card !p-4">
+              <p className="text-xs text-slate-500">{d.subjectShort}</p>
               <div className="flex items-center justify-between">
-                <p className="text-sm font-bold">{d.domain}</p>
-                <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${d.accuracy >= 80 ? "bg-green-100 text-green-700" : d.accuracy >= 60 ? "bg-amber-100 text-amber-800" : "bg-red-100 text-red-700"}`}>
+                <p className="text-sm font-bold">{d.label}</p>
+                <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${(d.accuracy ?? 0) >= 80 ? "bg-green-100 text-green-700" : (d.accuracy ?? 0) >= 60 ? "bg-amber-100 text-amber-800" : "bg-red-100 text-red-700"}`}>
                   {d.accuracy}%
                 </span>
               </div>
@@ -120,7 +120,7 @@ function DashboardInner() {
           <div key={r.id} className="card !p-4 text-sm">
             <span className="mr-2">{r.correct ? "✅" : "❌"}</span>
             <span className="font-semibold">{r.question.subject}</span>
-            <span className="text-slate-500"> · {r.question.domain} · </span>
+{r.question.section && <span className="text-slate-500"> · {r.question.section} · </span>}
             <span className="text-slate-600">{plainText(r.question.prompt).slice(0, 80)}…</span>
             <span className="text-slate-400"> · {new Date(r.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}</span>
           </div>

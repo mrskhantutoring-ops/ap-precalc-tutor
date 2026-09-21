@@ -35,8 +35,9 @@ model Session {
 model Question {
   id           String   @id @default(cuid())
   slug         String?  @unique // stable key for seed sync (e.g. "unit-1-01"); null for legacy rows until backfilled
-  subject      String   // sat-math | act-math | sat-reading-writing | act-english
-  domain       String   // official content domain, e.g. "Algebra"
+  subject      String   // unit-1 | unit-2 | unit-3 | unit-4
+  domain       String?  // legacy topic grouping; section is the primary organizer now
+  section      String?  // official CB section, e.g. "1.4"
   difficulty   String   @default("medium") // easy | medium | hard
   prompt       String   @db.Text
   choices      Json?    // string[] for multiple-choice; null for grid-in
@@ -47,6 +48,7 @@ model Question {
   attempts     Attempt[]
 
   @@index([subject, domain])
+  @@index([subject, section])
 }
 
 model Attempt {
