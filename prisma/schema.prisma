@@ -39,6 +39,7 @@ model Question {
   domain       String?  // legacy topic grouping; section is the primary organizer now
   section      String?  // official CB section, e.g. "1.4"
   title        String?  // short display title, e.g. "Average Rate of Change"
+  image        String?  // optional graph/diagram path, e.g. "/wkst/1-1/g1.png"
   difficulty   String   @default("medium") // easy | medium | hard
   prompt       String   @db.Text
   choices      Json?    // string[] for multiple-choice; null for grid-in

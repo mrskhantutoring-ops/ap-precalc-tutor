@@ -6,10 +6,11 @@
  * Math is written in LaTeX inside \(...\) delimiters and rendered in the
  * browser with MathJax (free, Apache-2.0). Keep every backslash doubled
  * inside these JS strings.
- * @typedef {{slug:string, subject:string, section:string|null, domain:string, difficulty:string, prompt:string,
+ * @typedef {{slug:string, subject:string, section:string|null, domain:string, difficulty:string, prompt:string, image:string|null,
  *   choices:string[]|null, correctIndex:number|null, correctText:string, explanation:string}} Q
  */
 /** @type {Q[]} */
+import { WKST11 } from "./wkst-1-1.mjs";
 export const QUESTIONS = [
   // ================= UNIT 1: POLYNOMIAL & RATIONAL FUNCTIONS =================
 
@@ -1437,4 +1438,5 @@ export const QUESTIONS = [
     choices: ["170", "180", "160", "200"], correctIndex: 1, correctText: "180",
     explanation: "Adults next month is the second entry of \\(\\begin{bmatrix} 0.7 & 0.1 \\\\ 0.2 & 0.8 \\end{bmatrix} \\begin{bmatrix} 100 \\\\ 200 \\end{bmatrix}\\), which is \\(0.2(100) + 0.8(200) = 20 + 160 = 180\\).",
   }
+  ,...WKST11
 ];

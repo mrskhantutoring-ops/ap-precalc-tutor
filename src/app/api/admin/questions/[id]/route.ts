@@ -18,6 +18,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     if (typeof body?.[k] === "string") data[k] = body[k];
   }
   if (typeof body?.title === "string") data.title = body.title.trim() || null;
+  if (typeof body?.image === "string") data.image = body.image.trim() || null;
   if (body?.choices === null) {
     data.choices = null;
     data.correctIndex = null;

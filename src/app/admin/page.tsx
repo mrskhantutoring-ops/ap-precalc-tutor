@@ -9,6 +9,7 @@ type Question = {
   subject: string;
   section: string | null;
   title: string | null;
+  image: string | null;
   difficulty: string;
   prompt: string;
   choices: string[] | null;
@@ -80,6 +81,7 @@ const emptyForm = {
   subject: "unit-1",
   section: "",
   title: "",
+  image: "",
   difficulty: "medium",
   prompt: "",
   choicesText: "",
@@ -145,6 +147,7 @@ export default function Admin() {
       subject: q.subject,
       section: q.section ?? "",
       title: q.title ?? "",
+      image: q.image ?? "",
       difficulty: q.difficulty,
       prompt: q.prompt,
       choicesText: (q.choices ?? []).join("\n"),
@@ -163,6 +166,7 @@ export default function Admin() {
       subject: form.subject,
       section: form.section,
       title: form.title.trim() || null,
+      image: form.image.trim() || null,
       difficulty: form.difficulty,
       prompt: form.prompt,
       choices,
@@ -311,6 +315,10 @@ export default function Admin() {
             <div>
               <label className="label">Short title <span className="font-normal text-slate-500">(shown in the section question list)</span></label>
               <input className="input" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="e.g. Average Rate of Change" />
+            </div>
+            <div>
+              <label className="label">Image <span className="font-normal text-slate-500">(optional graph path, e.g. /wkst/1-1/g1.png)</span></label>
+              <input className="input" value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} placeholder="/wkst/1-1/g1.png" />
             </div>
             <div>
               <label className="label">Prompt <span className="font-normal text-slate-500">{"(math: use LaTeX like \\(x^{2}\\), \\(\\frac{a}{b}\\), \\(\\sqrt{x}\\))"}</span></label>

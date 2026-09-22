@@ -9,6 +9,7 @@ type Question = {
   subject: string;
   section: string | null;
   title: string | null;
+  image: string | null;
   difficulty: string;
   prompt: string;
   choices: string[] | null;
@@ -189,6 +190,9 @@ export default function SectionPracticeClient({
                     <p className="text-xl leading-relaxed text-slate-900 md:text-2xl">
                       <MathText text={q.prompt} />
                     </p>
+                    {q.image && (
+                      <img src={q.image} alt="Graph for this question" className="mt-4 w-full max-w-2xl rounded-xl border border-slate-200 bg-white" />
+                    )}
 
                     {isMcq ? (
                       <div className="mt-5 space-y-2">

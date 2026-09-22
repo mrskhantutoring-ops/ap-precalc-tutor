@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
       ...(difficulty ? { difficulty } : {}),
     },
     select: {
-      id: true, subject: true, section: true, title: true, difficulty: true,
+      id: true, subject: true, section: true, title: true, image: true, difficulty: true,
       prompt: true, choices: true, correctIndex: true, correctText: true, explanation: true,
     },
     orderBy: { id: "asc" },

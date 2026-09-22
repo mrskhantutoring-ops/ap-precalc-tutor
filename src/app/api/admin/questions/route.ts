@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
   const subject = String(body?.subject ?? "").trim();
   const section = String(body?.section ?? "").trim();
   const title = String(body?.title ?? "").trim() || null;
+  const image = String(body?.image ?? "").trim() || null;
   const difficulty = String(body?.difficulty ?? "medium").trim();
   const prompt = String(body?.prompt ?? "").trim();
   const explanation = String(body?.explanation ?? "").trim();
@@ -41,7 +42,7 @@ export async function POST(req: NextRequest) {
   }
 
   const q = await db.question.create({
-    data: { subject, section, title, difficulty, prompt, choices: choices ?? undefined, correctIndex, correctText, explanation },
+    data: { subject, section, title, image, difficulty, prompt, choices: choices ?? undefined, correctIndex, correctText, explanation },
   });
   return NextResponse.json({ ok: true, question: q });
 }

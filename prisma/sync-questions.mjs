@@ -12,7 +12,7 @@ import { LEGACY_PROMPTS } from "./legacy-prompts.mjs";
 
 const db = new PrismaClient();
 
-const FIELDS = ["subject", "domain", "section", "title", "difficulty", "prompt", "choices", "correctIndex", "correctText", "explanation"];
+const FIELDS = ["subject", "domain", "section", "title", "image", "difficulty", "prompt", "choices", "correctIndex", "correctText", "explanation"];
 const same = (a, b) => JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
 
 async function main() {

@@ -9,6 +9,8 @@ type Question = {
   id: string;
   subject: string;
   section: string | null;
+  title: string | null;
+  image: string | null;
   difficulty: string;
   prompt: string;
   choices: string[] | null;
@@ -426,6 +428,9 @@ export default function PracticeClient({
                   Question {qi + 1}
                 </span>
                 <p className="mt-3 text-xl leading-relaxed md:text-2xl"><MathText text={qq.prompt} /></p>
+                {qq.image && (
+                  <img src={qq.image} alt="Graph for this question" className="mt-4 w-full max-w-2xl rounded-xl border border-slate-200 bg-white" />
+                )}
 
                 {isMcq ? (
                   <div className="mt-4 space-y-2">
@@ -546,6 +551,9 @@ export default function PracticeClient({
 
       <div className="card space-y-5">
         <p className="text-xl leading-relaxed md:text-2xl"><MathText text={q.prompt} /></p>
+        {q.image && (
+          <img src={q.image} alt="Graph for this question" className="mt-4 w-full max-w-2xl rounded-xl border border-slate-200 bg-white" />
+        )}
 
         {isMcq ? (
           <div className="space-y-2">
