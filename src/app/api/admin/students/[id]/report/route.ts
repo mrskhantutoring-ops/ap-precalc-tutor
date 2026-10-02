@@ -85,6 +85,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       testId: t.testId,
       title: test?.title ?? t.testId,
       questionCount: count,
+      questions: (test?.questions ?? []).map((q) => ({ key: q.key, label: q.label })),
       answeredCount,
       final: t.final,
       answers: t.answers as Record<string, string>,

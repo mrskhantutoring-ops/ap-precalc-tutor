@@ -69,6 +69,7 @@ type TimedTestSubmission = {
   testId: string;
   title: string;
   questionCount: number;
+  questions: { key: string; label: string }[];
   answeredCount: number;
   final: boolean;
   answers: Record<string, string>;
@@ -98,6 +99,7 @@ export default function Admin() {
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
   const [confirmDeleteStudentId, setConfirmDeleteStudentId] = useState<string | null>(null);
+  const [confirmResetTimedId, setConfirmResetTimedId] = useState<string | null>(null);
   const [reportStudentId, setReportStudentId] = useState<string | null>(null);
   const [reports, setReports] = useState<Record<string, StudentReport>>({});
   const [reportLoadingId, setReportLoadingId] = useState<string | null>(null);
@@ -219,6 +221,16 @@ export default function Admin() {
     loadAll();
   }
 
+  async function resetTimedTest(studentId: string, submissionId: string) {
+    await fetch(`/api/admin/timed-submissions/${submissionId}`, { method: "DELETE" });
+    setConfirmResetTimedId(null);
+    const res = await fetch(`/api/admin/students/${studentId}/report`);
+    if (res.ok) {
+      const data = await res.json();
+      setReports((prev) => ({ ...prev, [studentId]: { summary: data.summary, units: data.units, recent: data.recent, timedTests: data.timedTests } }));
+    }
+  }
+
   async function toggleReport(id: string) {
     if (reportStudentId === id) {
       setReportStudentId(null);
@@ -230,7 +242,7 @@ export default function Admin() {
       const res = await fetch(`/api/admin/students/${id}/report`);
       if (res.ok) {
         const data = await res.json();
-        setReports((prev) => ({ ...prev, [id]: { summary: data.summary, units: data.units, recent: data.recent } }));
+        setReports((prev) => ({ ...prev, [id]: { summary: data.summary, units: data.units, recent: data.recent, timedTests: data.timedTests } }));
       }
       setReportLoadingId(null);
     }
@@ -481,7 +493,11 @@ export default function Admin() {
                           <div>
                             <p className="mb-2 text-sm font-bold">Timed tests</p>
                             <div className="space-y-2">
-                              {(r.timedTests ?? []).map((t) => (
+                              {(r.timedTests ?? []).map((t) => {
+                                const qs = (t.questions ?? []).length > 0
+                                  ? t.questions
+                                  : Array.from({ length: t.questionCount }, (_, i) => ({ key: `q${i + 1}`, label: `Question ${i + 1}` }));
+                                return (
                                 <details key={t.id} className="rounded-xl border border-slate-200 bg-white p-3 text-sm">
                                   <summary className="cursor-pointer font-semibold">
                                     {t.title}
@@ -489,23 +505,34 @@ export default function Admin() {
                                       {t.final ? "Submitted" : "In progress"}
                                     </span>
                                   </summary>
-                                  <p className="mt-1 text-xs text-slate-400">
-                                    Started {new Date(t.startedAt).toLocaleString()}
-                                    {t.timeMs != null ? ` · time used ${Math.floor(t.timeMs / 60000)}:${String(Math.floor((t.timeMs % 60000) / 1000)).padStart(2, "0")}` : ""}
-                                    {" · "}{t.answeredCount}/{t.questionCount} answered
-                                  </p>
+                                  <div className="mt-1 flex items-center justify-between gap-2">
+                                    <p className="text-xs text-slate-400">
+                                      Started {new Date(t.startedAt).toLocaleString()}
+                                      {t.timeMs != null ? ` · time used ${Math.floor(t.timeMs / 60000)}:${String(Math.floor((t.timeMs % 60000) / 1000)).padStart(2, "0")}` : ""}
+                                      {" · "}{t.answeredCount}/{t.questionCount} answered
+                                    </p>
+                                    {confirmResetTimedId === t.id ? (
+                                      <span className="flex shrink-0 gap-1">
+                                        <button className="rounded-lg bg-red-600 px-2 py-1 text-xs font-bold text-white hover:bg-red-700" onClick={() => resetTimedTest(s.id, t.id)}>Confirm reset</button>
+                                        <button className="rounded-lg border border-slate-200 px-2 py-1 text-xs font-semibold text-slate-500" onClick={() => setConfirmResetTimedId(null)}>Cancel</button>
+                                      </span>
+                                    ) : (
+                                      <button className="shrink-0 rounded-lg border border-slate-200 px-2 py-1 text-xs font-semibold text-slate-500 hover:bg-slate-50" onClick={() => setConfirmResetTimedId(t.id)}>Reset test</button>
+                                    )}
+                                  </div>
                                   <div className="mt-2 max-h-72 space-y-2 overflow-y-auto">
-                                    {Array.from({ length: t.questionCount }, (_, i) => `q${i + 1}`).map((key) => (
-                                      <div key={key} className="rounded-lg bg-slate-50 p-2.5">
-                                        <p className="text-xs font-bold text-slate-500">Question {key.slice(1)}</p>
+                                    {qs.map((q) => (
+                                      <div key={q.key} className="rounded-lg bg-slate-50 p-2.5">
+                                        <p className="text-xs font-bold text-slate-500">{q.label}</p>
                                         <p className="mt-0.5 whitespace-pre-wrap text-slate-700">
-                                          {t.answers?.[key]?.trim() ? t.answers[key] : <span className="italic text-slate-400">(no answer)</span>}
+                                          {t.answers?.[q.key]?.trim() ? t.answers[q.key] : <span className="italic text-slate-400">(no answer)</span>}
                                         </p>
                                       </div>
                                     ))}
                                   </div>
                                 </details>
-                              ))}
+                                );
+                              })}
                             </div>
                           </div>
                         )}
