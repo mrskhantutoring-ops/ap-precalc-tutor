@@ -274,16 +274,16 @@ export default function TimedTestClient({ test }: { test: TimedTest }) {
       <div className="space-y-6 pt-6">
         {test.questions.map((q) => (
           <div key={q.key} className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">
-            <span className="inline-block rounded-full bg-slate-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-slate-500">
+            <span className="inline-block rounded-full bg-slate-100 px-3 py-1 text-sm font-bold uppercase tracking-wide text-slate-500">
               {q.label}
             </span>
             <img
               src={q.image}
               alt={`${q.label} worksheet page`}
-              className="mx-auto mt-4 w-full max-w-xl rounded-lg border border-slate-100"
+              className="mx-auto mt-4 w-full max-w-3xl rounded-lg border border-slate-100"
               loading="lazy"
             />
-            <div className="mx-auto mt-4 max-w-xl">
+            <div className="mx-auto mt-4 max-w-3xl">
               <label className="label">Your answer — show your work</label>
               <textarea
                 className="input min-h-28"
