@@ -17,20 +17,20 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-        <a href="https://promindstutoring.com/" className="flex items-center gap-2 text-lg font-extrabold tracking-tight text-black" aria-label="Pro Minds home">
+    <header className="sticky top-0 z-40 border-b border-[#bdd3dc] bg-white/95 backdrop-blur">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-2.5">
+        <a href="https://promindstutoring.com/" className="flex items-center gap-2.5 text-[19px] font-extrabold tracking-tight text-[#0a3d62]" aria-label="Pro Minds home">
           <img src="/pie-logo.png" alt="" width={28} height={28} className="rounded-full" />
-          {site.name}
+          <span>Pro Minds</span>
         </a>
-        <nav className="flex items-center gap-1 text-sm font-medium sm:gap-2">
-          <Link href="/practice" className="rounded-full px-3 py-2 text-black hover:bg-slate-100">
+        <nav className="flex items-center gap-1 text-[15px] font-extrabold sm:gap-2">
+          <Link href="/practice" className="rounded-full px-3 py-2 text-[#0a3d62] hover:bg-slate-100">
             Practice
           </Link>
-          <Link href="/dashboard" className="rounded-full px-3 py-2 text-black hover:bg-slate-100">
+          <Link href="/dashboard" className="rounded-full px-3 py-2 text-[#0a3d62] hover:bg-slate-100">
             Dashboard
           </Link>
-          <Link href="/contact" className="rounded-full px-3 py-2 text-black hover:bg-slate-100">
+          <Link href="/contact" className="rounded-full px-3 py-2 text-[#0a3d62] hover:bg-slate-100">
             Book a session
           </Link>
           {me ? (
