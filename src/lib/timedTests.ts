@@ -32,6 +32,18 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
     minutes: 30,
     questions: imageSet("unit1-section-1-5", "q", 10, "Question"),
   },
+  "unit1b-practice-test": {
+    id: "unit1b-practice-test",
+    title: "Unit 1B Practice Test — Transformations, Rational Functions & Models",
+    description:
+      "17 free-response questions in 3 parts (one answer box per part). You have 40 minutes. Your work auto-saves as you type and is submitted automatically when time runs out — after that the test is locked and cannot be reopened.",
+    minutes: 40,
+    questions: [
+      { key: "part1", label: "Part 1: Transformations of Functions (Q1–5)", image: "/timed/unit1b-practice-test/p1.png" },
+      { key: "part2", label: "Part 2: Rational Functions & Their Properties (Q6–13)", image: "/timed/unit1b-practice-test/p2.png" },
+      { key: "part3", label: "Part 3: Function Models & Applications (Q14–17)", image: "/timed/unit1b-practice-test/p3.png" },
+    ],
+  },
 };
 
 export function timedTestById(id: string): TimedTest | null {
