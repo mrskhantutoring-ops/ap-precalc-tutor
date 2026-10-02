@@ -12,7 +12,12 @@ function formatTime(s: number) {
   return `${m}:${r.toString().padStart(2, "0")}`;
 }
 
-export default function TimedTestClient({ test }: { test: TimedTest }) {
+export default function TimedTestClient({ test, preview = false }: { test: TimedTest; preview?: boolean }) {
+  const previewBanner = preview ? (
+    <p className="rounded-xl bg-amber-100 px-4 py-2 text-center text-sm font-semibold text-amber-800">
+      &#128065; Admin preview &mdash; you&apos;re seeing exactly what students see. Nothing is saved or sent.
+    </p>
+  ) : null;
   const [phase, setPhase] = useState<Phase>("loading");
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
@@ -32,6 +37,7 @@ export default function TimedTestClient({ test }: { test: TimedTest }) {
   const saveDraft = useCallback(async () => {
     if (!dirtyRef.current) return;
     dirtyRef.current = false;
+    if (preview) return;
     setSaving(true);
     try {
       await fetch("/api/timed-tests", {
@@ -53,6 +59,7 @@ export default function TimedTestClient({ test }: { test: TimedTest }) {
     dirtyRef.current = false;
     setSaving(true);
     try {
+      if (preview) throw { previewDone: true };
       const res = await fetch("/api/timed-tests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -63,9 +70,13 @@ export default function TimedTestClient({ test }: { test: TimedTest }) {
         throw new Error(d?.error ?? "Could not submit.");
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not submit.");
-      finishedRef.current = false;
-      return;
+      if (e && typeof e === "object" && "previewDone" in e) {
+        // fall through — preview skips the server submit
+      } else {
+        setError(e instanceof Error ? e.message : "Could not submit.");
+        finishedRef.current = false;
+        return;
+      }
     } finally {
       setSaving(false);
     }
@@ -77,6 +88,10 @@ export default function TimedTestClient({ test }: { test: TimedTest }) {
 
   // Load any existing submission (draft or final).
   useEffect(() => {
+    if (preview) {
+      setPhase("setup");
+      return;
+    }
     fetch(`/api/timed-tests?testId=${encodeURIComponent(test.id)}`)
       .then((r) => r.json())
       .then((d) => {
@@ -141,6 +156,15 @@ export default function TimedTestClient({ test }: { test: TimedTest }) {
 
   async function start() {
     setError(null);
+    if (preview) {
+      const now = new Date().toISOString();
+      setStartedAt(now);
+      deadlineRef.current = Date.now() + test.minutes * 60 * 1000;
+      warnedRef.current = { five: false, one: false };
+      finishedRef.current = false;
+      setPhase("answering");
+      return;
+    }
     // Anchor the start time immediately; if a draft exists the server keeps the original.
     try {
       const res = await fetch("/api/timed-tests", {
@@ -179,6 +203,7 @@ export default function TimedTestClient({ test }: { test: TimedTest }) {
   if (phase === "setup") {
     return (
       <div className="mx-auto max-w-2xl space-y-6">
+        {previewBanner}
         <div>
           <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Timed test</p>
           <h1 className="mt-1 text-3xl font-extrabold tracking-tight">{test.title}</h1>
@@ -213,11 +238,14 @@ export default function TimedTestClient({ test }: { test: TimedTest }) {
   if (phase === "submitted") {
     return (
       <div className="mx-auto max-w-2xl space-y-6">
+        {previewBanner}
         <div className="card text-center">
           <p className="text-4xl">🔒</p>
-          <h1 className="mt-2 text-3xl font-extrabold">Test submitted</h1>
+          <h1 className="mt-2 text-3xl font-extrabold">{preview ? "Preview finished" : "Test submitted"}</h1>
           <p className="mt-2 text-slate-600">
-            Your work has been saved and sent to your teacher. This test is now locked — it can't be reopened or changed.
+            {preview
+              ? "That's the full student experience. Nothing was saved or sent."
+              : "Your work has been saved and sent to your teacher. This test is now locked — it can't be reopened or changed."}
           </p>
           {timeUsed && (
             <p className="mt-3 font-mono text-lg font-bold">Time used: {timeUsed}</p>
@@ -237,7 +265,7 @@ export default function TimedTestClient({ test }: { test: TimedTest }) {
             </div>
           ))}
         </div>
-        <Link href="/dashboard" className="btn-secondary w-full text-center">Back to dashboard</Link>
+        <Link href={preview ? "/admin" : "/dashboard"} className="btn-secondary w-full text-center">{preview ? "Back to admin" : "Back to dashboard"}</Link>
       </div>
     );
   }
@@ -247,6 +275,7 @@ export default function TimedTestClient({ test }: { test: TimedTest }) {
 
   return (
     <div className="mx-auto max-w-3xl">
+      {previewBanner}
       {timeWarning && (
         <div className="mb-4 flex items-start justify-between gap-3 rounded-xl bg-brand-50 p-4 text-sm font-semibold text-brand-800">
           <p>⏰ {timeWarning}</p>
@@ -264,7 +293,7 @@ export default function TimedTestClient({ test }: { test: TimedTest }) {
               ⏱ {formatTime(secondsLeft)}
             </p>
           )}
-          <p className="hidden text-xs text-slate-400 sm:block">{saving ? "Saving…" : "Auto-saved"}</p>
+          <p className="hidden text-xs text-slate-400 sm:block">{preview ? "Preview — not saved" : saving ? "Saving…" : "Auto-saved"}</p>
         </div>
         <div className="mx-auto mt-2 h-1.5 max-w-3xl overflow-hidden rounded-full bg-slate-200">
           <div className="h-full bg-black transition-all" style={{ width: `${(answeredCount / test.questions.length) * 100}%` }} />
