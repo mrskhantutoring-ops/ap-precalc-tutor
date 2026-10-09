@@ -56,6 +56,18 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
       { key: "part3", label: "Part 3: Function Models & Applications (Q14–17)", image: "/timed/unit1b-practice-test-2/p3.png" },
     ],
   },
+  "unit1b-fixit-drill": {
+    id: "unit1b-fixit-drill",
+    title: "Unit 1B Fix-It Drill — Asymptotes, Even/Odd & Transformations",
+    description:
+      "12 questions built from the mistakes on your last test: non-vertical asymptotes and end behavior, even and odd functions, and plugging into transformed functions. 3 parts (one answer box per part). You have 20 minutes. Your work auto-saves as you type and is submitted automatically when time runs out — after that the test is locked and cannot be reopened.",
+    minutes: 20,
+    questions: [
+      { key: "part1", label: "Part 1: Asymptotes & End Behavior (Q1–5)", image: "/timed/unit1b-fixit-drill/p1.png" },
+      { key: "part2", label: "Part 2: Even & Odd Functions (Q6–9)", image: "/timed/unit1b-fixit-drill/p2.png" },
+      { key: "part3", label: "Part 3: Transformations & Graphing Habits (Q10–12)", image: "/timed/unit1b-fixit-drill/p3.png" },
+    ],
+  },
 };
 
 export function timedTestById(id: string): TimedTest | null {
