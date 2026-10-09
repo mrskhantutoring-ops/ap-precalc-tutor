@@ -30,6 +30,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
   const deadlineRef = useRef<number | null>(null);
   const warnedRef = useRef({ five: false, one: false });
   const finishedRef = useRef(false);
+  const submitFailedRef = useRef(false);
   const answersRef = useRef(answers);
   const dirtyRef = useRef(false);
   answersRef.current = answers;
@@ -56,6 +57,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
   const submitFinal = useCallback(async () => {
     if (finishedRef.current) return;
     finishedRef.current = true;
+    submitFailedRef.current = false;
     dirtyRef.current = false;
     setSaving(true);
     try {
@@ -65,6 +67,23 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ testId: test.id, answers: answersRef.current, final: true }),
       });
+      if (res.status === 409) {
+        // The server already locked this test (it auto-finalizes at the deadline,
+        // e.g. after a reload). Show the stored submission instead of erroring —
+        // retrying a 409 in a loop is what made the page flicker.
+        const d = await fetch(`/api/timed-tests?testId=${encodeURIComponent(test.id)}`)
+          .then((r) => r.json())
+          .catch(() => null);
+        const s = d?.submission;
+        if (s) {
+          setAnswers((s.answers ?? {}) as Record<string, string>);
+          setStartedAt(s.startedAt ?? null);
+          setTimeUsed(s.timeMs != null ? formatTime(Math.round(s.timeMs / 1000)) : null);
+        }
+        setSecondsLeft(null);
+        setPhase("submitted");
+        return;
+      }
       if (!res.ok) {
         const d = await res.json().catch(() => null);
         throw new Error(d?.error ?? "Could not submit.");
@@ -75,6 +94,9 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
       } else {
         setError(e instanceof Error ? e.message : "Could not submit.");
         finishedRef.current = false;
+        // Stop the countdown from auto-retrying twice a second (the flicker);
+        // the student can still tap Submit to try again.
+        submitFailedRef.current = true;
         return;
       }
     } finally {
@@ -93,7 +115,10 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
       return;
     }
     fetch(`/api/timed-tests?testId=${encodeURIComponent(test.id)}`)
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error("load failed");
+        return r.json();
+      })
       .then((d) => {
         const s = d.submission;
         if (s?.final) {
@@ -132,7 +157,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
         warnedRef.current.one = true;
         setTimeWarning("1 minute remaining — finish up!");
       }
-      if (remain <= 0) submitFinal();
+      if (remain <= 0 && !submitFailedRef.current) submitFinal();
     };
     tick();
     const id = setInterval(tick, 500);
