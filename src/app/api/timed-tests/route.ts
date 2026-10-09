@@ -5,18 +5,19 @@ import { timedTestById } from "@/lib/timedTests";
 
 export const dynamic = "force-dynamic";
 
-function sanitizeAnswers(input: unknown, count: number): Record<string, string> {
+function sanitizeAnswers(input: unknown, keys: string[]): Record<string, string> {
+  // Keep only the test's own question keys (e.g. "q1"…"q10", or "part1"…"part3").
+  // This previously assumed every test used q-numbered keys, which silently
+  // stripped all answers from part-based tests like Unit 1B.
+  const keep = new Set(keys);
   const out: Record<string, string> = {};
   if (input && typeof input === "object") {
     for (const [k, v] of Object.entries(input as Record<string, unknown>)) {
-      if (/^q\d+$/.test(k) && typeof v === "string") {
+      if (keep.has(k) && typeof v === "string") {
         out[k] = v.slice(0, 20000);
       }
     }
   }
-  // keep only keys that belong to a question on the test
-  const keep = new Set(Array.from({ length: count }, (_, i) => `q${i + 1}`));
-  for (const k of Object.keys(out)) if (!keep.has(k)) delete out[k];
   return out;
 }
 
@@ -81,7 +82,7 @@ export async function POST(req: NextRequest) {
   const test = timedTestById(testId);
   if (!test) return NextResponse.json({ error: "Unknown test." }, { status: 404 });
 
-  const answers = sanitizeAnswers(body?.answers, test.questions.length);
+  const answers = sanitizeAnswers(body?.answers, test.questions.map((q) => q.key));
   const wantFinal = body?.final === true;
 
   const existing = await db.timedSubmission.findUnique({
