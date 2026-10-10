@@ -100,6 +100,10 @@ export default function Admin() {
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
   const [confirmDeleteStudentId, setConfirmDeleteStudentId] = useState<string | null>(null);
+  const [pwResetId, setPwResetId] = useState<string | null>(null);
+  const [pwValue, setPwValue] = useState("");
+  const [pwDoneId, setPwDoneId] = useState<string | null>(null);
+  const [pwError, setPwError] = useState<string | null>(null);
   const [confirmResetTimedId, setConfirmResetTimedId] = useState<string | null>(null);
   const [reportStudentId, setReportStudentId] = useState<string | null>(null);
   const [reports, setReports] = useState<Record<string, StudentReport>>({});
@@ -214,6 +218,23 @@ export default function Admin() {
       body: JSON.stringify({ isPaid }),
     });
     loadAll();
+  }
+
+  async function resetStudentPassword(id: string) {
+    setPwError(null);
+    const res = await fetch(`/api/admin/students/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: pwValue }),
+    });
+    if (res.ok) {
+      setPwResetId(null);
+      setPwValue("");
+      setPwDoneId(id);
+    } else {
+      const data = await res.json().catch(() => null);
+      setPwError(data?.error ?? "Could not reset the password.");
+    }
   }
 
   async function removeStudent(id: string) {
@@ -428,6 +449,17 @@ export default function Admin() {
                 >
                   {s.isPaid ? "Revoke enrollment" : "Mark enrolled"}
                 </button>
+                <button
+                  className="btn-secondary !px-3 !py-1.5 text-sm"
+                  onClick={() => {
+                    setPwResetId(pwResetId === s.id ? null : s.id);
+                    setPwValue("");
+                    setPwError(null);
+                    setPwDoneId(null);
+                  }}
+                >
+                  Reset password
+                </button>
                 {confirmDeleteStudentId === s.id ? (
                   <>
                     <button className="rounded-xl bg-red-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-red-700" onClick={() => removeStudent(s.id)}>Confirm delete</button>
@@ -437,6 +469,36 @@ export default function Admin() {
                   <button className="rounded-xl border border-red-200 px-3 py-1.5 text-sm font-semibold text-red-600 hover:bg-red-50" onClick={() => setConfirmDeleteStudentId(s.id)}>Delete</button>
                 )}
               </div>
+              {pwDoneId === s.id && (
+                <p className="mt-3 rounded-lg bg-green-50 px-3 py-2 text-sm font-semibold text-green-700">
+                  Password updated — {s.name} signs in with the new password now.
+                </p>
+              )}
+              {pwResetId === s.id && (
+                <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
+                  <label className="label">New password for {s.name} (8+ characters)</label>
+                  <div className="mt-1 flex flex-wrap gap-2">
+                    <input
+                      className="input !w-auto flex-1"
+                      type="password"
+                      value={pwValue}
+                      onChange={(e) => setPwValue(e.target.value)}
+                      placeholder="Type the new password"
+                      autoComplete="new-password"
+                    />
+                    <button
+                      className="rounded-xl bg-brand-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-50"
+                      onClick={() => resetStudentPassword(s.id)}
+                      disabled={pwValue.length < 8}
+                    >
+                      Set password
+                    </button>
+                    <button className="btn-secondary !px-3 !py-1.5 text-sm" onClick={() => setPwResetId(null)}>Cancel</button>
+                  </div>
+                  {pwError && <p className="mt-2 text-sm text-red-600">{pwError}</p>}
+                  <p className="mt-2 text-xs text-slate-400">This signs {s.name} out everywhere; they log back in with the new password.</p>
+                </div>
+              )}
               {reportStudentId === s.id && (
                 <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
                   {reportLoadingId === s.id && <p className="text-sm text-slate-500">Loading report…</p>}
