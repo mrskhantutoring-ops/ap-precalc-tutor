@@ -1558,6 +1558,129 @@ export const QUESTIONS = [
     prompt: "A linear function \\(f\\) and an exponential function \\(g\\) both pass through the points \\((0, 4)\\) and \\((1, 12)\\). How much greater is \\(g(3)\\) than \\(f(3)\\)?",
     choices: ["76", "80", "84", "108"], correctIndex: 1, correctText: "80",
     explanation: "Linear: the rate of change is \\(12 - 4 = 8\\), so \\(f(3) = 4 + 3(8) = 28\\). Exponential: the growth factor is \\(\\frac{12}{4} = 3\\), so \\(g(3) = 4 \\cdot 3^{3} = 108\\). The difference is \\(108 - 28 = 80\\).",
+  },
+  // ---------- Section 2.3 | Exponential Functions (draft additions) ----------
+  {
+    slug: "unit-2-83", title: "Initial Value and Percent Rate of Growth", subject: "unit-2", section: "2.3", domain: "Exponential Functions", difficulty: "easy",
+    prompt: "A population is modeled by \\(P(t) = 640(1.25)^{t}\\), where \\(t\\) is the number of years since the population was first counted. Which of the following describes the population?",
+    choices: ["Initial value 640, growing by 25% per year", "Initial value 640, growing by 125% per year", "Initial value 1.25, growing by 25% per year", "Initial value 640, growing by 2.5% per year"], correctIndex: 0, correctText: "Initial value 640, growing by 25% per year",
+    explanation: "In \\(P(t) = a(b)^{t}\\), the initial value is \\(a = 640\\). The growth factor \\(b = 1.25 = 1 + 0.25\\) means the population grows by 25% per year.",
+  },
+  {
+    slug: "unit-2-84", title: "Evaluating an Exponential at a Negative Input", subject: "unit-2", section: "2.3", domain: "Exponential Functions", difficulty: "easy",
+    prompt: "If \\(f(x) = 8(2)^{x}\\), what is the value of \\(f(-2)\\)?",
+    choices: ["1", "2", "4", "32"], correctIndex: 1, correctText: "2",
+    explanation: "Substitute \\(x = -2\\): \\(f(-2) = 8(2)^{-2} = 8 \\cdot \\frac{1}{4} = 2\\).",
+  },
+  {
+    slug: "unit-2-85", title: "Exponential Function from a Table", subject: "unit-2", section: "2.3", domain: "Exponential Functions", difficulty: "medium",
+    prompt: "A function \\(f\\) is defined by the table: \\(x = 0, 1, 2, 3\\) gives \\(f(x) = 5, 15, 45, 135\\). Which of the following defines \\(f(x)\\)?",
+    choices: ["\\(5(3)^{x}\\)", "\\(3(5)^{x}\\)", "\\(5(2)^{x}\\)", "\\(15(3)^{x}\\)"], correctIndex: 0, correctText: "\\(5(3)^{x}\\)",
+    explanation: "The initial value is \\(f(0) = 5\\), and each output is 3 times the previous one, so the growth factor is 3: \\(f(x) = 5(3)^{x}\\). Check: \\(5(3)^{2} = 45\\).",
+  },
+  {
+    slug: "unit-2-86", title: "Horizontal Asymptote of a Shifted Exponential", subject: "unit-2", section: "2.3", domain: "Exponential Functions", difficulty: "medium",
+    prompt: "What is the equation of the horizontal asymptote of the graph of \\(f(x) = 3(2)^{x} + 4\\)?",
+    choices: ["\\(y = 0\\)", "\\(y = 3\\)", "\\(y = 4\\)", "\\(y = 7\\)"], correctIndex: 2, correctText: "\\(y = 4\\)",
+    explanation: "As \\(x \\to -\\infty\\), \\(3(2)^{x} \\to 0\\), so \\(f(x) \\to 4\\). The graph approaches the line \\(y = 4\\) but never reaches it.",
+  },
+  {
+    slug: "unit-2-87", title: "Exponential Function Through Two Points", subject: "unit-2", section: "2.3", domain: "Exponential Functions", difficulty: "medium",
+    prompt: "An exponential function \\(f\\) in the form \\(f(x) = a(b)^{x}\\) passes through the points \\((0, 4)\\) and \\((2, 36)\\). Which of the following defines \\(f(x)\\)?",
+    choices: ["\\(4(3)^{x}\\)", "\\(4(9)^{x}\\)", "\\(3(4)^{x}\\)", "\\(4(6)^{x}\\)"], correctIndex: 0, correctText: "\\(4(3)^{x}\\)",
+    explanation: "From \\((0, 4)\\), \\(a = 4\\). From \\((2, 36)\\), \\(4b^{2} = 36\\), so \\(b^{2} = 9\\) and \\(b = 3\\) (the base is positive). Thus \\(f(x) = 4(3)^{x}\\).",
+  },
+  {
+    slug: "unit-2-88", title: "Range of a Reflected Exponential", subject: "unit-2", section: "2.3", domain: "Exponential Functions", difficulty: "medium",
+    prompt: "What is the range of the function \\(f(x) = -2(5)^{x} + 3\\)?",
+    choices: ["\\((3, \\infty)\\)", "\\((-\\infty, 3)\\)", "\\((-\\infty, \\infty)\\)", "\\((-3, \\infty)\\)"], correctIndex: 1, correctText: "\\((-\\infty, 3)\\)",
+    explanation: "\\((5)^{x} > 0\\) for all \\(x\\), so \\(-2(5)^{x} < 0\\) and \\(f(x) < 3\\). As \\(x \\to -\\infty\\), \\(f(x)\\) approaches 3 from below, and as \\(x \\to \\infty\\), \\(f(x) \\to -\\infty\\). The range is \\((-\\infty, 3)\\).",
+  },
+  {
+    slug: "unit-2-89", title: "Growth Factor from Nonconsecutive Values", subject: "unit-2", section: "2.3", domain: "Exponential Functions", difficulty: "medium",
+    prompt: "An exponential function \\(f\\) satisfies \\(f(0) = 7\\) and \\(f(3) = 189\\). What is the growth factor of \\(f\\)?",
+    choices: ["7", "3", "9", "27"], correctIndex: 1, correctText: "3",
+    explanation: "Over 3 equal intervals the output is multiplied by \\(\\frac{189}{7} = 27\\), so the growth factor \\(b\\) satisfies \\(b^{3} = 27\\), giving \\(b = 3\\).",
+  },
+  {
+    slug: "unit-2-90", title: "Doubling Bacteria Population", subject: "unit-2", section: "2.3", domain: "Exponential Functions", difficulty: "easy",
+    prompt: "A culture of bacteria doubles every hour. The culture starts with 150 bacteria, so the number of bacteria after \\(t\\) hours is modeled by \\(B(t) = 150(2)^{t}\\). How many bacteria are in the culture after 4 hours?",
+    choices: ["600", "1,200", "2,400", "4,800"], correctIndex: 2, correctText: "2,400",
+    explanation: "\\(B(4) = 150(2)^{4} = 150(16) = 2{,}400\\).",
+  },
+  {
+    slug: "unit-2-91", title: "End Behavior in Both Directions", subject: "unit-2", section: "2.3", domain: "Exponential Functions", difficulty: "hard",
+    prompt: "Which of the following best describes the end behavior of \\(f(x) = 6(0.5)^{x} - 2\\)?",
+    choices: ["As \\(x \\to \\infty\\), \\(f(x) \\to -2\\); as \\(x \\to -\\infty\\), \\(f(x) \\to \\infty\\)", "As \\(x \\to \\infty\\), \\(f(x) \\to \\infty\\); as \\(x \\to -\\infty\\), \\(f(x) \\to -2\\)", "As \\(x \\to \\infty\\), \\(f(x) \\to -2\\); as \\(x \\to -\\infty\\), \\(f(x) \\to -2\\)", "As \\(x \\to \\infty\\), \\(f(x) \\to 0\\); as \\(x \\to -\\infty\\), \\(f(x) \\to \\infty\\)"], correctIndex: 0, correctText: "As \\(x \\to \\infty\\), \\(f(x) \\to -2\\); as \\(x \\to -\\infty\\), \\(f(x) \\to \\infty\\)",
+    explanation: "As \\(x \\to \\infty\\), \\((0.5)^{x} \\to 0\\), so \\(f(x) \\to -2\\). As \\(x \\to -\\infty\\), \\((0.5)^{x}\\) grows without bound, so \\(f(x) \\to \\infty\\).",
+  },
+  {
+    slug: "unit-2-92", title: "Describing a Shifted Exponential", subject: "unit-2", section: "2.3", domain: "Exponential Functions", difficulty: "medium",
+    prompt: "The graph of \\(g(x) = 3^{x-2} + 1\\) is obtained from the graph of \\(f(x) = 3^{x}\\) by which of the following transformations?",
+    choices: ["Shift left 2 units and up 1 unit", "Shift right 2 units and up 1 unit", "Shift right 2 units and down 1 unit", "Shift left 2 units and down 1 unit"], correctIndex: 1, correctText: "Shift right 2 units and up 1 unit",
+    explanation: "Replacing \\(x\\) with \\(x - 2\\) shifts the graph right 2 units, and adding 1 shifts it up 1 unit.",
+  },
+
+  // ---------- Section 2.4 | Exponential Function Manipulation (draft additions) ----------
+  {
+    slug: "unit-2-93", title: "Power of an Exponential Power", subject: "unit-2", section: "2.4", domain: "Exponential Functions", difficulty: "easy",
+    prompt: "Which of the following is equivalent to \\((5^{x})^{3}\\)?",
+    choices: ["\\(5^{x+3}\\)", "\\(15^{x}\\)", "\\(125^{x}\\)", "\\(5^{3+x}\\)"], correctIndex: 2, correctText: "\\(125^{x}\\)",
+    explanation: "\\((5^{x})^{3} = 5^{3x} = (5^{3})^{x} = 125^{x}\\).",
+  },
+  {
+    slug: "unit-2-94", title: "Square Base as a Power", subject: "unit-2", section: "2.4", domain: "Exponential Functions", difficulty: "easy",
+    prompt: "Which of the following is equivalent to \\(49^{x}\\)?",
+    choices: ["\\(7^{2x}\\)", "\\(7^{x/2}\\)", "\\(14^{x}\\)", "\\(49^{2x}\\)"], correctIndex: 0, correctText: "\\(7^{2x}\\)",
+    explanation: "Since \\(49 = 7^{2}\\), \\(49^{x} = (7^{2})^{x} = 7^{2x}\\).",
+  },
+  {
+    slug: "unit-2-95", title: "Rewriting with a Constant Factor", subject: "unit-2", section: "2.4", domain: "Exponential Functions", difficulty: "medium",
+    prompt: "Rewrite \\(3^{x-2}\\) in the form \\(k \\cdot 3^{x}\\). Which is correct?",
+    choices: ["\\(\\frac{1}{9} \\cdot 3^{x}\\)", "\\(9 \\cdot 3^{x}\\)", "\\(-9 \\cdot 3^{x}\\)", "\\(\\frac{1}{3} \\cdot 3^{x}\\)"], correctIndex: 0, correctText: "\\(\\frac{1}{9} \\cdot 3^{x}\\)",
+    explanation: "\\(3^{x-2} = 3^{x} \\cdot 3^{-2} = \\frac{1}{9} \\cdot 3^{x}\\), so \\(k = \\frac{1}{9}\\).",
+  },
+  {
+    slug: "unit-2-96", title: "Product as a Single Power of Two", subject: "unit-2", section: "2.4", domain: "Exponential Functions", difficulty: "medium",
+    prompt: "Express \\(16^{x} \\cdot 2^{x+1}\\) as a single power of \\(2\\).",
+    choices: ["\\(2^{5x-1}\\)", "\\(2^{5x+1}\\)", "\\(2^{17x+1}\\)", "\\(8^{5x+1}\\)"], correctIndex: 1, correctText: "\\(2^{5x+1}\\)",
+    explanation: "\\(16^{x} = (2^{4})^{x} = 2^{4x}\\). Multiplying adds the exponents: \\(2^{4x} \\cdot 2^{x+1} = 2^{5x+1}\\).",
+  },
+  {
+    slug: "unit-2-97", title: "Quotient with the Same Base", subject: "unit-2", section: "2.4", domain: "Exponential Functions", difficulty: "medium",
+    prompt: "Which of the following is equivalent to \\(\\frac{7^{2x}}{7^{x-4}}\\)?",
+    choices: ["\\(7^{x-4}\\)", "\\(7^{3x-4}\\)", "\\(7^{x+4}\\)", "\\(49^{x+4}\\)"], correctIndex: 2, correctText: "\\(7^{x+4}\\)",
+    explanation: "Dividing powers with the same base subtracts the exponents: \\(2x - (x - 4) = x + 4\\), so the quotient is \\(7^{x+4}\\).",
+  },
+  {
+    slug: "unit-2-98", title: "Fractional Base as a Power of Two", subject: "unit-2", section: "2.4", domain: "Exponential Functions", difficulty: "medium",
+    prompt: "Which of the following is equivalent to \\(\\left(\\frac{1}{8}\\right)^{x}\\)?",
+    choices: ["\\(2^{-x/3}\\)", "\\(2^{-3x}\\)", "\\((-8)^{x}\\)", "\\(4^{-x}\\)"], correctIndex: 1, correctText: "\\(2^{-3x}\\)",
+    explanation: "\\(\\frac{1}{8} = 2^{-3}\\), so \\(\\left(\\frac{1}{8}\\right)^{x} = (2^{-3})^{x} = 2^{-3x}\\).",
+  },
+  {
+    slug: "unit-2-99", title: "Combining Powers of Three", subject: "unit-2", section: "2.4", domain: "Exponential Functions", difficulty: "hard",
+    prompt: "Express \\(9^{x} \\cdot 27^{x+1}\\) as a single power of \\(3\\).",
+    choices: ["\\(3^{5x+3}\\)", "\\(3^{6x+3}\\)", "\\(3^{5x+1}\\)", "\\(9^{5x+3}\\)"], correctIndex: 0, correctText: "\\(3^{5x+3}\\)",
+    explanation: "\\(9^{x} = (3^{2})^{x} = 3^{2x}\\) and \\(27^{x+1} = (3^{3})^{x+1} = 3^{3x+3}\\). Multiplying adds the exponents: \\(3^{2x + 3x + 3} = 3^{5x+3}\\).",
+  },
+  {
+    slug: "unit-2-100", title: "Root Form of an Exponential", subject: "unit-2", section: "2.4", domain: "Exponential Functions", difficulty: "medium",
+    prompt: "Which of the following is equivalent to \\(25^{x/2}\\)?",
+    choices: ["\\(5^{2x}\\)", "\\(25^{2x}\\)", "\\(5^{x}\\)", "\\(5^{x/2}\\)"], correctIndex: 2, correctText: "\\(5^{x}\\)",
+    explanation: "\\(25^{x/2} = (5^{2})^{x/2} = 5^{2 \\cdot (x/2)} = 5^{x}\\).",
+  },
+  {
+    slug: "unit-2-101", title: "Combining Powers of Three with a Shift", subject: "unit-2", section: "2.4", domain: "Exponential Functions", difficulty: "hard",
+    prompt: "Express \\(81^{x} \\cdot 3^{2x-1}\\) as a single power of \\(3\\).",
+    choices: ["\\(3^{6x+1}\\)", "\\(3^{8x-1}\\)", "\\(3^{6x-1}\\)", "\\(27^{6x-1}\\)"], correctIndex: 2, correctText: "\\(3^{6x-1}\\)",
+    explanation: "\\(81^{x} = (3^{4})^{x} = 3^{4x}\\). Multiplying adds the exponents: \\(3^{4x} \\cdot 3^{2x-1} = 3^{6x-1}\\).",
+  },
+  {
+    slug: "unit-2-102", title: "Rewriting a Growth Function with Base Two", subject: "unit-2", section: "2.4", domain: "Exponential Functions", difficulty: "medium",
+    prompt: "A quantity is modeled by \\(f(t) = 200(4)^{t}\\). Which of the following is an equivalent form of \\(f(t)\\)?",
+    choices: ["\\(200(8)^{t}\\)", "\\(200(2)^{t/2}\\)", "\\(400(2)^{t}\\)", "\\(200(2)^{2t}\\)"], correctIndex: 3, correctText: "\\(200(2)^{2t}\\)",
+    explanation: "Since \\(4 = 2^{2}\\), \\(200(4)^{t} = 200(2^{2})^{t} = 200(2)^{2t}\\).",
   }
   ,...WKST11
 ];
