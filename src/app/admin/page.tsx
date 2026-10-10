@@ -73,6 +73,7 @@ type TimedTestSubmission = {
   answeredCount: number;
   final: boolean;
   answers: Record<string, string>;
+  drawings: Record<string, string>;
   startedAt: string;
   finishedAt: string | null;
   timeMs: number | null;
@@ -527,6 +528,13 @@ export default function Admin() {
                                         <p className="mt-0.5 whitespace-pre-wrap text-slate-700">
                                           {t.answers?.[q.key]?.trim() ? t.answers[q.key] : <span className="italic text-slate-400">(no answer)</span>}
                                         </p>
+                                        {t.drawings?.[q.key] && (
+                                          <img
+                                            src={t.drawings[q.key]}
+                                            alt={`Handwritten work for ${q.label}`}
+                                            className="mt-2 w-full rounded-lg border border-slate-200 bg-white"
+                                          />
+                                        )}
                                       </div>
                                     ))}
                                   </div>

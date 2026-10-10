@@ -21,6 +21,42 @@ function sanitizeAnswers(input: unknown, keys: string[]): Record<string, string>
   return out;
 }
 
+const MAX_DRAWING_CHARS = 1_200_000; // ~900 KB of base64 — a full handwriting pad exports well under this
+
+function sanitizeDrawings(input: unknown, keys: string[]): Record<string, string | null> {
+  // Handwriting pads, validated exactly like answers: only the test's own keys,
+  // only image data URLs of a sane size. A null value means "pad cleared".
+  const keep = new Set(keys);
+  const out: Record<string, string | null> = {};
+  if (input && typeof input === "object") {
+    for (const [k, v] of Object.entries(input as Record<string, unknown>)) {
+      if (!keep.has(k)) continue;
+      if (v === null) {
+        out[k] = null;
+      } else if (
+        typeof v === "string" &&
+        v.length <= MAX_DRAWING_CHARS &&
+        (v.startsWith("data:image/jpeg;base64,") || v.startsWith("data:image/png;base64,"))
+      ) {
+        out[k] = v;
+      }
+    }
+  }
+  return out;
+}
+
+function mergeDrawings(
+  stored: Record<string, string>,
+  patch: Record<string, string | null>
+): Record<string, string> {
+  const out = { ...stored };
+  for (const [k, v] of Object.entries(patch)) {
+    if (v === null) delete out[k];
+    else out[k] = v;
+  }
+  return out;
+}
+
 async function finalizeIfExpired(row: { id: string; final: boolean; startedAt: Date; answers: unknown }, minutes: number) {
   if (row.final) return false;
   const deadline = row.startedAt.getTime() + minutes * 60 * 1000;
@@ -63,6 +99,7 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({
     submission: {
       answers: (fresh?.answers ?? {}) as Record<string, string>,
+      drawings: (fresh?.drawings ?? {}) as Record<string, string>,
       final: fresh?.final ?? false,
       startedAt: fresh?.startedAt.toISOString(),
       finishedAt: fresh?.finishedAt?.toISOString() ?? null,
@@ -83,6 +120,7 @@ export async function POST(req: NextRequest) {
   if (!test) return NextResponse.json({ error: "Unknown test." }, { status: 404 });
 
   const answers = sanitizeAnswers(body?.answers, test.questions.map((q) => q.key));
+  const drawingPatch = sanitizeDrawings(body?.drawings, test.questions.map((q) => q.key));
   const wantFinal = body?.final === true;
 
   const existing = await db.timedSubmission.findUnique({
@@ -93,6 +131,10 @@ export async function POST(req: NextRequest) {
     if (existing.final || (await finalizeIfExpired(existing, test.minutes))) {
       return NextResponse.json({ error: "This test is already submitted and locked." }, { status: 409 });
     }
+    const drawings = mergeDrawings(
+      (existing.drawings ?? {}) as Record<string, string>,
+      drawingPatch
+    );
     if (wantFinal) {
       const now = Date.now();
       const deadline = existing.startedAt.getTime() + test.minutes * 60 * 1000;
@@ -101,6 +143,7 @@ export async function POST(req: NextRequest) {
         where: { id: existing.id },
         data: {
           answers,
+          drawings,
           final: true,
           finishedAt: new Date(end),
           timeMs: Math.max(0, end - existing.startedAt.getTime()),
@@ -110,7 +153,7 @@ export async function POST(req: NextRequest) {
     }
     const updated = await db.timedSubmission.update({
       where: { id: existing.id },
-      data: { answers },
+      data: { answers, drawings },
     });
     return NextResponse.json({ ok: true, final: false, startedAt: updated.startedAt.toISOString() });
   }
@@ -121,6 +164,7 @@ export async function POST(req: NextRequest) {
       testId,
       userId: user.id,
       answers,
+      drawings: mergeDrawings({}, drawingPatch),
       final: wantFinal,
       finishedAt: wantFinal ? new Date() : null,
       timeMs: wantFinal ? 0 : null,

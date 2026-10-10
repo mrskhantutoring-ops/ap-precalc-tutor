@@ -77,9 +77,16 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   const timedTests = timed.map((t) => {
     const test = timedTestById(t.testId);
     const count = test?.questions.length ?? 0;
-    const answeredCount = Object.values((t.answers ?? {}) as Record<string, unknown>).filter(
-      (v) => typeof v === "string" && v.trim()
-    ).length;
+    const answersMap = (t.answers ?? {}) as Record<string, unknown>;
+    const drawingsMap = (t.drawings ?? {}) as Record<string, unknown>;
+    const answeredKeys = new Set<string>();
+    for (const [k, v] of Object.entries(answersMap)) {
+      if (typeof v === "string" && v.trim()) answeredKeys.add(k);
+    }
+    for (const [k, v] of Object.entries(drawingsMap)) {
+      if (typeof v === "string" && v) answeredKeys.add(k);
+    }
+    const answeredCount = answeredKeys.size;
     return {
       id: t.id,
       testId: t.testId,
@@ -89,6 +96,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       answeredCount,
       final: t.final,
       answers: t.answers as Record<string, string>,
+      drawings: (t.drawings ?? {}) as Record<string, string>,
       startedAt: t.startedAt.toISOString(),
       finishedAt: t.finishedAt?.toISOString() ?? null,
       timeMs: t.timeMs ?? null,

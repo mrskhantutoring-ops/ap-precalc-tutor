@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { TimedTest } from "@/lib/timedTests";
+import DrawingPad from "./DrawingPad";
 
 type Phase = "loading" | "setup" | "answering" | "submitted";
 
@@ -20,6 +21,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
   ) : null;
   const [phase, setPhase] = useState<Phase>("loading");
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [drawings, setDrawings] = useState<Record<string, string>>({});
   const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
   const [timeWarning, setTimeWarning] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -34,21 +36,38 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
   const answersRef = useRef(answers);
   const dirtyRef = useRef(false);
   answersRef.current = answers;
+  const drawingsRef = useRef(drawings);
+  drawingsRef.current = drawings;
+  const dirtyDrawingsRef = useRef<Set<string>>(new Set());
 
   const saveDraft = useCallback(async () => {
     if (!dirtyRef.current) return;
     dirtyRef.current = false;
     if (preview) return;
+    // Send only the handwriting pads that changed since the last save —
+    // full images every 15 seconds would waste bandwidth.
+    const sentKeys = [...dirtyDrawingsRef.current];
+    const drawingPatch: Record<string, string | null> = {};
+    for (const k of sentKeys) {
+      drawingPatch[k] = drawingsRef.current[k] ?? null;
+      dirtyDrawingsRef.current.delete(k);
+    }
     setSaving(true);
     try {
       await fetch("/api/timed-tests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ testId: test.id, answers: answersRef.current, final: false }),
+        body: JSON.stringify({
+          testId: test.id,
+          answers: answersRef.current,
+          drawings: drawingPatch,
+          final: false,
+        }),
       });
     } catch {
       // best effort — retry on the next cycle
       dirtyRef.current = true;
+      for (const k of sentKeys) dirtyDrawingsRef.current.add(k);
     } finally {
       setSaving(false);
     }
@@ -65,7 +84,12 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
       const res = await fetch("/api/timed-tests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ testId: test.id, answers: answersRef.current, final: true }),
+        body: JSON.stringify({
+          testId: test.id,
+          answers: answersRef.current,
+          drawings: drawingsRef.current,
+          final: true,
+        }),
       });
       if (res.status === 409) {
         // The server already locked this test (it auto-finalizes at the deadline,
@@ -77,6 +101,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
         const s = d?.submission;
         if (s) {
           setAnswers((s.answers ?? {}) as Record<string, string>);
+          setDrawings((s.drawings ?? {}) as Record<string, string>);
           setStartedAt(s.startedAt ?? null);
           setTimeUsed(s.timeMs != null ? formatTime(Math.round(s.timeMs / 1000)) : null);
         }
@@ -123,12 +148,14 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
         const s = d.submission;
         if (s?.final) {
           setAnswers((s.answers ?? {}) as Record<string, string>);
+          setDrawings((s.drawings ?? {}) as Record<string, string>);
           setStartedAt(s.startedAt ?? null);
           setTimeUsed(s.timeMs != null ? formatTime(Math.round(s.timeMs / 1000)) : null);
           setPhase("submitted");
         } else if (s?.startedAt) {
           // Resume an in-progress draft
           setAnswers((s.answers ?? {}) as Record<string, string>);
+          setDrawings((s.drawings ?? {}) as Record<string, string>);
           setStartedAt(s.startedAt);
           deadlineRef.current = new Date(s.startedAt).getTime() + test.minutes * 60 * 1000;
           warnedRef.current = { five: false, one: false };
@@ -221,6 +248,17 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
     setAnswers((a) => ({ ...a, [key]: value }));
   }
 
+  function setDrawing(key: string, value: string | null) {
+    dirtyRef.current = true;
+    dirtyDrawingsRef.current.add(key);
+    setDrawings((d) => {
+      const next = { ...d };
+      if (value === null) delete next[key];
+      else next[key] = value;
+      return next;
+    });
+  }
+
   if (phase === "loading") {
     return <p className="text-slate-500">Loading test…</p>;
   }
@@ -241,7 +279,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
           </div>
           <div className="flex items-center gap-3">
             <span className="text-2xl">📝</span>
-            <p><strong className="text-black">{test.questions.length} free-response questions</strong> — type your answer and show your work under each one.</p>
+            <p><strong className="text-black">{test.questions.length} free-response questions</strong> — type your answer, or write your work by hand on the writing pad under each one.</p>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-2xl">💾</span>
@@ -287,6 +325,13 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
               <p className="mt-1 whitespace-pre-wrap text-sm text-slate-600">
                 {answers[q.key]?.trim() ? answers[q.key] : <span className="italic text-slate-400">(no answer)</span>}
               </p>
+              {drawings[q.key] && (
+                <img
+                  src={drawings[q.key]}
+                  alt={`Your written work for ${q.label}`}
+                  className="mt-2 w-full rounded-lg border border-slate-200"
+                />
+              )}
             </div>
           ))}
         </div>
@@ -296,7 +341,9 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
   }
 
   // ── Answering ──
-  const answeredCount = test.questions.filter((q) => answers[q.key]?.trim()).length;
+  const answeredCount = test.questions.filter(
+    (q) => answers[q.key]?.trim() || drawings[q.key]
+  ).length;
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -344,6 +391,12 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
                 value={answers[q.key] ?? ""}
                 onChange={(e) => setAnswer(q.key, e.target.value)}
                 placeholder="Type your answer and work here…"
+              />
+            </div>
+            <div className="mx-auto mt-5 max-w-3xl border-t border-slate-100 pt-4">
+              <DrawingPad
+                value={drawings[q.key] ?? null}
+                onChange={(v) => setDrawing(q.key, v)}
               />
             </div>
           </div>

@@ -85,6 +85,7 @@ model TimedSubmission {
   userId     String
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   answers    Json     @default("{}") // { "q1": "...", "q2": "...", ... }
+  drawings   Json     @default("{}") // { "q1": "data:image/jpeg;base64,...", ... } handwriting pads
   startedAt  DateTime @default(now())
   final      Boolean  @default(false)
   finishedAt DateTime?
