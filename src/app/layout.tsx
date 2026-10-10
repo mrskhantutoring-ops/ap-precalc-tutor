@@ -58,7 +58,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <p className="font-bold text-white">Fine print</p>
               <p className="mt-2 text-xs leading-relaxed text-slate-400">
                 © {new Date().getFullYear()} {site.name}. All practice questions are original and for study use only.
-                AP® is a trademark of the College Board. This site is not affiliated with or endorsed by the College Board.
+                AP® and Advanced Placement® are registered trademarks of the College Board, which was not involved in the production of, and does not endorse, this site.
               </p>
             </div>
           </div>
