@@ -1438,5 +1438,126 @@ export const QUESTIONS = [
     choices: ["170", "180", "160", "200"], correctIndex: 1, correctText: "180",
     explanation: "Adults next month is the second entry of \\(\\begin{bmatrix} 0.7 & 0.1 \\\\ 0.2 & 0.8 \\end{bmatrix} \\begin{bmatrix} 100 \\\\ 200 \\end{bmatrix}\\), which is \\(0.2(100) + 0.8(200) = 20 + 160 = 180\\).",
   }
+  ,
+  {
+    slug: "unit-2-63", title: "Seats in the Twelfth Row", subject: "unit-2", section: "2.1", domain: "Sequences", difficulty: "easy",
+    prompt: "The first row of a small theater has \\(16\\) seats. Each row after the first has \\(3\\) more seats than the row before it. How many seats are in the 12th row?",
+    choices: ["46", "49", "52", "36"], correctIndex: 1, correctText: "49",
+    explanation: "The row sizes form an arithmetic sequence with \\(a_{1} = 16\\) and \\(d = 3\\). So \\(a_{12} = 16 + (12 - 1)(3) = 16 + 33 = 49\\).",
+  },
+  {
+    slug: "unit-2-64", title: "Seventh Term of a Geometric Sequence", subject: "unit-2", section: "2.1", domain: "Sequences", difficulty: "medium",
+    prompt: "The first term of a geometric sequence is \\(5\\), and the common ratio is \\(3\\). What is the 7th term of the sequence?",
+    choices: ["1215", "3645", "2187", "10935"], correctIndex: 1, correctText: "3645",
+    explanation: "For a geometric sequence, \\(a_{n} = a_{1} r^{n-1}\\). So \\(a_{7} = 5 \\cdot 3^{6} = 5(729) = 3645\\).",
+  },
+  {
+    slug: "unit-2-65", title: "First Term From Two Terms", subject: "unit-2", section: "2.1", domain: "Sequences", difficulty: "medium",
+    prompt: "In an arithmetic sequence, \\(a_{3} = 11\\) and \\(a_{8} = 31\\). What is the first term of the sequence?",
+    choices: ["3", "5", "7", "4"], correctIndex: 0, correctText: "3",
+    explanation: "Going from \\(a_{3}\\) to \\(a_{8}\\) adds \\(5d\\), so \\(5d = 31 - 11 = 20\\) and \\(d = 4\\). Then \\(a_{1} = a_{3} - 2d = 11 - 8 = 3\\).",
+  },
+  {
+    slug: "unit-2-66", title: "Sixth Term From Two Terms", subject: "unit-2", section: "2.1", domain: "Sequences", difficulty: "medium",
+    prompt: "In a geometric sequence, \\(a_{2} = 12\\) and \\(a_{5} = 96\\). What is \\(a_{6}\\)?",
+    choices: ["128", "160", "192", "384"], correctIndex: 2, correctText: "192",
+    explanation: "Going from \\(a_{2}\\) to \\(a_{5}\\) multiplies by \\(r^{3}\\), so \\(r^{3} = \\frac{96}{12} = 8\\) and \\(r = 2\\). Then \\(a_{6} = a_{5} \\cdot r = 96 \\cdot 2 = 192\\).",
+  },
+  {
+    slug: "unit-2-67", title: "Formula for a Sequence From Values", subject: "unit-2", section: "2.1", domain: "Sequences", difficulty: "easy",
+    prompt: "A sequence is given by its values: when \\(n = 0, 1, 2, 3\\), the terms \\(a_{n}\\) are \\(7, 10, 13, 16\\) respectively. Which formula gives \\(a_{n}\\)?",
+    choices: ["\\(a_{n} = 3n + 7\\)", "\\(a_{n} = 7n + 3\\)", "\\(a_{n} = 7 \\cdot 3^{n}\\)", "\\(a_{n} = 3 \\cdot 7^{n}\\)"], correctIndex: 0, correctText: "\\(a_{n} = 3n + 7\\)",
+    explanation: "The terms increase by a constant difference of \\(3\\), starting from \\(7\\) at \\(n = 0\\), so \\(a_{n} = 7 + 3n\\).",
+  },
+  {
+    slug: "unit-2-68", title: "Hiker's Elevation After Six Hours", subject: "unit-2", section: "2.1", domain: "Sequences", difficulty: "medium",
+    prompt: "A hiker begins a descent at an elevation of \\(2{,}450\\) feet. Her elevation decreases by \\(85\\) feet every hour. What is her elevation, in feet, after \\(6\\) hours?",
+    choices: ["2025", "1940", "1855", "2365"], correctIndex: 1, correctText: "1940",
+    explanation: "The elevations form an arithmetic sequence with common difference \\(-85\\). After \\(6\\) hours the elevation is \\(2450 - 6(85) = 2450 - 510 = 1940\\) feet.",
+  },
+  {
+    slug: "unit-2-69", title: "Medicine Remaining at Hour Five", subject: "unit-2", section: "2.1", domain: "Sequences", difficulty: "medium",
+    prompt: "A patient takes a \\(240\\)-milligram dose of a medicine. At the start of each hour, the amount of medicine in the body is half of what it was at the start of the previous hour, beginning with \\(240\\) milligrams at hour \\(1\\). How many milligrams are in the body at the start of hour \\(5\\)?",
+    choices: ["30", "15", "7.5", "60"], correctIndex: 1, correctText: "15",
+    explanation: "The amounts form a geometric sequence: \\(a_{n} = 240\\left(\\frac{1}{2}\\right)^{n-1}\\). So \\(a_{5} = 240\\left(\\frac{1}{2}\\right)^{4} = \\frac{240}{16} = 15\\) milligrams.",
+  },
+  {
+    slug: "unit-2-70", title: "Which Term Equals 99", subject: "unit-2", section: "2.1", domain: "Sequences", difficulty: "hard",
+    prompt: "The terms of an arithmetic sequence are \\(4, 9, 14, 19, \\ldots\\). The value \\(99\\) is which term of the sequence?",
+    choices: ["19th", "20th", "21st", "18th"], correctIndex: 1, correctText: "20th",
+    explanation: "Here \\(a_{n} = 4 + 5(n - 1)\\). Setting \\(4 + 5(n-1) = 99\\) gives \\(5(n - 1) = 95\\), so \\(n - 1 = 19\\) and \\(n = 20\\).",
+  },
+  {
+    slug: "unit-2-71", title: "Town Population in Three Years", subject: "unit-2", section: "2.1", domain: "Sequences", difficulty: "hard",
+    prompt: "A town's population grows by the same percent each year. This year the population is \\(8{,}000\\), and next year it is projected to be \\(8{,}400\\). If the pattern continues, what will the population be in \\(3\\) years?",
+    choices: ["9200", "9261", "9720", "8400"], correctIndex: 1, correctText: "9261",
+    explanation: "The yearly populations form a geometric sequence with ratio \\(\\frac{8400}{8000} = 1.05\\). In \\(3\\) years the population is \\(8000(1.05)^{3} = 9261\\).",
+  },
+  {
+    slug: "unit-2-72", title: "Situation Modeled by a Geometric Sequence", subject: "unit-2", section: "2.1", domain: "Sequences", difficulty: "medium",
+    prompt: "Which of the following situations is best modeled by a geometric sequence?",
+    choices: ["A runner increases her weekly long run by \\(2\\) miles each week", "Each bounce of a dropped ball reaches \\(\\frac{3}{4}\\) of the height of the previous bounce", "A worker's salary increases by \\(\\$1{,}500\\) each year", "The temperature falls \\(3^{\\circ}\\)F every hour during a cold front"], correctIndex: 1, correctText: "Each bounce of a dropped ball reaches \\(\\frac{3}{4}\\) of the height of the previous bounce",
+    explanation: "A geometric sequence changes by a constant ratio. Each bounce height is \\(\\frac{3}{4}\\) of the previous one — a constant multiplier. The other situations change by a constant amount, so they are arithmetic.",
+  },
+  {
+    slug: "unit-2-73", title: "Linear or Exponential From a Table", subject: "unit-2", section: "2.2", domain: "Exponential Functions", difficulty: "easy",
+    prompt: "A function \\(f\\) is given by its values: when \\(x = 0, 1, 2, 3\\), the values of \\(f(x)\\) are \\(9, 13, 17, 21\\) respectively. Which statement about \\(f\\) is correct?",
+    choices: ["\\(f\\) is linear, increasing by \\(4\\) for each unit increase in \\(x\\)", "\\(f\\) is exponential, with growth factor \\(4\\)", "\\(f\\) is exponential, with growth factor \\(\\frac{13}{9}\\)", "\\(f\\) is neither linear nor exponential"], correctIndex: 0, correctText: "\\(f\\) is linear, increasing by \\(4\\) for each unit increase in \\(x\\)",
+    explanation: "The successive differences are \\(13 - 9 = 4\\), \\(17 - 13 = 4\\), and \\(21 - 17 = 4\\). A constant difference over equal intervals means \\(f\\) is linear.",
+  },
+  {
+    slug: "unit-2-74", title: "Average Rate of Change of an Exponential", subject: "unit-2", section: "2.2", domain: "Exponential Functions", difficulty: "medium",
+    prompt: "An exponential function \\(g\\) is given by its values: when \\(x = 0, 1, 2\\), the values of \\(g(x)\\) are \\(3, 6, 12\\) respectively. What is the average rate of change of \\(g\\) on the interval \\([0, 2]\\)?",
+    choices: ["9", "6", "4.5", "3"], correctIndex: 2, correctText: "4.5",
+    explanation: "Average rate of change \\(= \\frac{g(2) - g(0)}{2 - 0} = \\frac{12 - 3}{2} = \\frac{9}{2} = 4.5\\).",
+  },
+  {
+    slug: "unit-2-75", title: "Successive Average Rates of Change", subject: "unit-2", section: "2.2", domain: "Exponential Functions", difficulty: "medium",
+    prompt: "Let \\(h(x) = 5 \\cdot 2^{x}\\). The average rate of change of \\(h\\) on \\([0, 1]\\) is \\(5\\), and on \\([1, 2]\\) it is \\(10\\). What is the average rate of change of \\(h\\) on \\([2, 3]\\)?",
+    choices: ["15", "20", "25", "40"], correctIndex: 1, correctText: "20",
+    explanation: "For an exponential function, average rates of change over consecutive unit intervals grow by the same factor as the function itself: \\(5, 10, 20, \\ldots\\). Checking directly, \\(h(3) - h(2) = 40 - 20 = 20\\).",
+  },
+  {
+    slug: "unit-2-76", title: "Twelve Percent Yearly Loss", subject: "unit-2", section: "2.2", domain: "Exponential Functions", difficulty: "medium",
+    prompt: "A car loses \\(12\\%\\) of its current value each year. Which description matches how the car's value \\(V\\) changes from one year to the next?",
+    choices: ["\\(V\\) is multiplied by \\(0.12\\)", "\\(V\\) is multiplied by \\(0.88\\)", "\\(V\\) decreases by \\(12\\) dollars", "\\(V\\) is multiplied by \\(1.12\\)"], correctIndex: 1, correctText: "\\(V\\) is multiplied by \\(0.88\\)",
+    explanation: "Losing \\(12\\%\\) of the current value leaves \\(88\\%\\) of it, so each year the value is multiplied by \\(0.88\\) — exponential decay.",
+  },
+  {
+    slug: "unit-2-77", title: "Exponential Value From Nonconsecutive Inputs", subject: "unit-2", section: "2.2", domain: "Exponential Functions", difficulty: "hard",
+    prompt: "An exponential function \\(f\\) satisfies \\(f(0) = 2\\) and \\(f(3) = 54\\). What is \\(f(1)\\)?",
+    choices: ["18", "10", "6", "12"], correctIndex: 2, correctText: "6",
+    explanation: "Over \\(3\\) units the output is multiplied by \\(\\frac{54}{2} = 27\\), so the growth factor per unit is \\(27^{1/3} = 3\\). Thus \\(f(1) = 2 \\cdot 3 = 6\\).",
+  },
+  {
+    slug: "unit-2-78", title: "Rate of Change of a Linear Function", subject: "unit-2", section: "2.2", domain: "Exponential Functions", difficulty: "easy",
+    prompt: "A linear function \\(p\\) is given by two values: \\(p(1) = 40\\) and \\(p(5) = 64\\). What is the rate of change of \\(p\\)?",
+    choices: ["24", "12", "6", "4.8"], correctIndex: 2, correctText: "6",
+    explanation: "Rate of change \\(= \\frac{64 - 40}{5 - 1} = \\frac{24}{4} = 6\\) per unit.",
+  },
+  {
+    slug: "unit-2-79", title: "Comparing Two Savings Plans", subject: "unit-2", section: "2.2", domain: "Exponential Functions", difficulty: "hard",
+    prompt: "Two savings plans start today. Plan A is linear: its value is \\(50 + 30n\\) dollars after \\(n\\) months. Plan B is exponential: its value is \\(40 \\cdot (1.5)^{n}\\) dollars after \\(n\\) months. After \\(4\\) months, how do the values compare?",
+    choices: ["Plan B is greater by \\(32.5\\) dollars", "Plan A is greater by \\(32.5\\) dollars", "The two plans are equal", "Plan B is greater by \\(52.5\\) dollars"], correctIndex: 0, correctText: "Plan B is greater by \\(32.5\\) dollars",
+    explanation: "Plan A: \\(50 + 30(4) = 170\\) dollars. Plan B: \\(40(1.5)^{4} = 40(5.0625) = 202.5\\) dollars. So Plan B is greater by \\(202.5 - 170 = 32.5\\) dollars.",
+  },
+  {
+    slug: "unit-2-80", title: "Balance After Two Months of Growth", subject: "unit-2", section: "2.2", domain: "Exponential Functions", difficulty: "medium",
+    prompt: "An account balance of \\(\\$250\\) grows by \\(8\\%\\) each month. What is the balance, in dollars, after \\(2\\) months?",
+    choices: ["270", "290", "291.6", "283.5"], correctIndex: 2, correctText: "291.6",
+    explanation: "Each month the balance is multiplied by \\(1.08\\), so after \\(2\\) months it is \\(250(1.08)^{2} = 250(1.1664) = 291.6\\) dollars.",
+  },
+  {
+    slug: "unit-2-81", title: "Pattern in Average Rates of Change", subject: "unit-2", section: "2.2", domain: "Exponential Functions", difficulty: "medium",
+    prompt: "A function \\(f\\) is given by its values: when \\(x = 0, 1, 2, 3\\), the values of \\(f(x)\\) are \\(2, 6, 18, 54\\) respectively. Which statement about the average rates of change of \\(f\\) is correct?",
+    choices: ["The average rates of change over consecutive unit intervals are all equal", "Each average rate of change over a unit interval is \\(3\\) times the previous one", "Each average rate of change over a unit interval is \\(8\\) more than the previous one", "The average rate of change on \\([0, 3]\\) is \\(52\\)"], correctIndex: 1, correctText: "Each average rate of change over a unit interval is \\(3\\) times the previous one",
+    explanation: "The average rates of change over unit intervals are \\(6 - 2 = 4\\), \\(18 - 6 = 12\\), and \\(54 - 18 = 36\\). Each is \\(3\\) times the previous one — the signature of exponential growth with growth factor \\(3\\).",
+  },
+  {
+    slug: "unit-2-82", title: "Linear Versus Exponential Through Two Points", subject: "unit-2", section: "2.2", domain: "Exponential Functions", difficulty: "hard",
+    prompt: "A linear function \\(f\\) and an exponential function \\(g\\) both pass through the points \\((0, 4)\\) and \\((1, 12)\\). How much greater is \\(g(3)\\) than \\(f(3)\\)?",
+    choices: ["76", "80", "84", "108"], correctIndex: 1, correctText: "80",
+    explanation: "Linear: the rate of change is \\(12 - 4 = 8\\), so \\(f(3) = 4 + 3(8) = 28\\). Exponential: the growth factor is \\(\\frac{12}{4} = 3\\), so \\(g(3) = 4 \\cdot 3^{3} = 108\\). The difference is \\(108 - 28 = 80\\).",
+  }
   ,...WKST11
 ];
