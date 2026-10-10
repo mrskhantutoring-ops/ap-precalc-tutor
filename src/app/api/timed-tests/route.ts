@@ -26,7 +26,13 @@ const MAX_DRAWING_CHARS = 1_200_000; // ~900 KB of base64 — a full handwriting
 function sanitizeDrawings(input: unknown, keys: string[]): Record<string, string | null> {
   // Handwriting pads, validated exactly like answers: only the test's own keys,
   // only image data URLs of a sane size. A null value means "pad cleared".
-  const keep = new Set(keys);
+  // Each question/part also allows two extra work pages ("<key>_pg2", "<key>_pg3").
+  const keep = new Set<string>();
+  for (const k of keys) {
+    keep.add(k);
+    keep.add(`${k}_pg2`);
+    keep.add(`${k}_pg3`);
+  }
   const out: Record<string, string | null> = {};
   if (input && typeof input === "object") {
     for (const [k, v] of Object.entries(input as Record<string, unknown>)) {

@@ -22,6 +22,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
   const [phase, setPhase] = useState<Phase>("loading");
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [drawings, setDrawings] = useState<Record<string, string>>({});
+  const [pageCounts, setPageCounts] = useState<Record<string, number>>({});
   const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
   const [timeWarning, setTimeWarning] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -279,7 +280,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
           </div>
           <div className="flex items-center gap-3">
             <span className="text-2xl">📝</span>
-            <p><strong className="text-black">{test.questions.length} free-response questions</strong> — type your answer, or write your work by hand on the writing pad under each one.</p>
+            <p><strong className="text-black">{test.questions.length} free-response questions</strong> — type your answer, or write your work by hand on the writing pad under each one. Need more room? You can add up to 2 extra writing pages under any question.</p>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-2xl">💾</span>
@@ -332,6 +333,18 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
                   className="mt-2 w-full rounded-lg border border-slate-200"
                 />
               )}
+              {[2, 3].map((n) =>
+                drawings[`${q.key}_pg${n}`] ? (
+                  <div key={n}>
+                    <p className="mt-3 text-xs font-bold uppercase tracking-wide text-slate-400">Page {n}</p>
+                    <img
+                      src={drawings[`${q.key}_pg${n}`]}
+                      alt={`Your written work for ${q.label}, page ${n}`}
+                      className="mt-1 w-full rounded-lg border border-slate-200"
+                    />
+                  </div>
+                ) : null
+              )}
             </div>
           ))}
         </div>
@@ -341,8 +354,21 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
   }
 
   // ── Answering ──
+  // Pages shown for a question: whatever the student added with the button,
+  // plus any page that already has saved work on it (so a resumed draft —
+  // or a restored submission — reopens with all its pages visible).
+  const pagesFor = (key: string) =>
+    Math.max(
+      pageCounts[key] ?? 1,
+      drawings[`${key}_pg3`] ? 3 : drawings[`${key}_pg2`] ? 2 : 1
+    );
+
   const answeredCount = test.questions.filter(
-    (q) => answers[q.key]?.trim() || drawings[q.key]
+    (q) =>
+      answers[q.key]?.trim() ||
+      drawings[q.key] ||
+      drawings[`${q.key}_pg2`] ||
+      drawings[`${q.key}_pg3`]
   ).length;
 
   return (
@@ -394,10 +420,33 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
               />
             </div>
             <div className="mx-auto mt-5 max-w-3xl border-t border-slate-100 pt-4">
-              <DrawingPad
-                value={drawings[q.key] ?? null}
-                onChange={(v) => setDrawing(q.key, v)}
-              />
+              {Array.from({ length: pagesFor(q.key) }, (_, i) => {
+                const pk = i === 0 ? q.key : `${q.key}_pg${i + 1}`;
+                return (
+                  <div key={pk} className={i > 0 ? "mt-5 border-t border-dashed border-slate-200 pt-4" : ""}>
+                    {i > 0 && (
+                      <p className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-400">
+                        Page {i + 1} — extra work space
+                      </p>
+                    )}
+                    <DrawingPad
+                      value={drawings[pk] ?? null}
+                      onChange={(v) => setDrawing(pk, v)}
+                    />
+                  </div>
+                );
+              })}
+              {pagesFor(q.key) < 3 && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setPageCounts((c) => ({ ...c, [q.key]: pagesFor(q.key) + 1 }))
+                  }
+                  className="mt-3 w-full rounded-lg border border-dashed border-slate-300 py-2 text-sm font-semibold text-slate-500 hover:bg-slate-50 hover:text-slate-700"
+                >
+                  + Add another page for more work space
+                </button>
+              )}
             </div>
           </div>
         ))}

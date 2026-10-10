@@ -84,9 +84,10 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       if (typeof v === "string" && v.trim()) answeredKeys.add(k);
     }
     for (const [k, v] of Object.entries(drawingsMap)) {
-      if (typeof v === "string" && v) answeredKeys.add(k);
+      // Extra work pages ("<key>_pg2" / "<key>_pg3") count toward their own question.
+      if (typeof v === "string" && v) answeredKeys.add(k.replace(/_pg[23]$/, ""));
     }
-    const answeredCount = answeredKeys.size;
+    const answeredCount = Math.min(answeredKeys.size, count);
     return {
       id: t.id,
       testId: t.testId,

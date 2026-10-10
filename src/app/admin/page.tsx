@@ -535,6 +535,18 @@ export default function Admin() {
                                             className="mt-2 w-full rounded-lg border border-slate-200 bg-white"
                                           />
                                         )}
+                                        {[2, 3].map((n) =>
+                                          t.drawings?.[`${q.key}_pg${n}`] ? (
+                                            <div key={n}>
+                                              <p className="mt-2 text-[11px] font-bold uppercase tracking-wide text-slate-400">Page {n}</p>
+                                              <img
+                                                src={t.drawings[`${q.key}_pg${n}`]}
+                                                alt={`Handwritten work for ${q.label}, page ${n}`}
+                                                className="mt-1 w-full rounded-lg border border-slate-200 bg-white"
+                                              />
+                                            </div>
+                                          ) : null
+                                        )}
                                       </div>
                                     ))}
                                   </div>
