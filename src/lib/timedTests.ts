@@ -70,7 +70,7 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
   },
   "quiz-1-retake": {
     id: "quiz-1-retake",
-    title: "Quiz 1 Retake — Rational Functions",
+    title: "Unit 1B Quiz Retake",
     description:
       "10 free-response questions. You have 30 minutes. Your work auto-saves as you type and is submitted automatically when time runs out — after that the test is locked and cannot be reopened.",
     minutes: 30,
