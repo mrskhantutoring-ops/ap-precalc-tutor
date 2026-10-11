@@ -76,6 +76,14 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
     minutes: 30,
     questions: imageSet("quiz-1-retake", "q", 10, "Question"),
   },
+  "unit2-test-1": {
+    id: "unit2-test-1",
+    title: "Unit 2 Test 1",
+    description:
+      "20 multiple-choice questions on exponential functions (Topics 2.3–2.4). Type the letter of your answer for each question and show your work on the writing pad. Quick rules: a = starting multiplier (negative flips the graph), b = growth factor (b > 1 grows, 0 < b < 1 decays), k = the floor/ceiling y = k that the curve never touches. You have 40 minutes. Your work auto-saves as you type and is submitted automatically when time runs out — after that the test is locked and cannot be reopened.",
+    minutes: 40,
+    questions: imageSet("unit2-test-1", "q", 20, "Question"),
+  },
 };
 
 export function timedTestById(id: string): TimedTest | null {
