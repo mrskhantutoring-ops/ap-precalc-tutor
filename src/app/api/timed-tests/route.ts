@@ -63,8 +63,9 @@ function mergeDrawings(
   return out;
 }
 
-async function finalizeIfExpired(row: { id: string; final: boolean; startedAt: Date; answers: unknown }, minutes: number) {
+async function finalizeIfExpired(row: { id: string; final: boolean; startedAt: Date; answers: unknown }, minutes: number, soft = false) {
   if (row.final) return false;
+  if (soft) return false; // soft-timer drills never auto-finalize — the timer is a target only
   const deadline = row.startedAt.getTime() + minutes * 60 * 1000;
   if (Date.now() >= deadline) {
     const answers = row.answers as Record<string, string> | null;
@@ -97,7 +98,7 @@ export async function GET(req: NextRequest) {
   });
   if (!row) return NextResponse.json({ submission: null });
 
-  await finalizeIfExpired(row, test.minutes);
+  await finalizeIfExpired(row, test.minutes, test.softTimer);
   const fresh = await db.timedSubmission.findUnique({
     where: { testId_userId: { testId, userId: user.id } },
   });
@@ -134,7 +135,7 @@ export async function POST(req: NextRequest) {
   });
 
   if (existing) {
-    if (existing.final || (await finalizeIfExpired(existing, test.minutes))) {
+    if (existing.final || (await finalizeIfExpired(existing, test.minutes, test.softTimer))) {
       return NextResponse.json({ error: "This test is already submitted and locked." }, { status: 409 });
     }
     const drawings = mergeDrawings(
@@ -144,7 +145,7 @@ export async function POST(req: NextRequest) {
     if (wantFinal) {
       const now = Date.now();
       const deadline = existing.startedAt.getTime() + test.minutes * 60 * 1000;
-      const end = Math.min(now, deadline);
+      const end = test.softTimer ? now : Math.min(now, deadline);
       const updated = await db.timedSubmission.update({
         where: { id: existing.id },
         data: {

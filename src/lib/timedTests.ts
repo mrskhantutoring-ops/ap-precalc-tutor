@@ -12,6 +12,10 @@ export type TimedTest = {
   title: string;
   description: string;
   minutes: number;
+  // Soft timer (speed drills): the countdown is a target only — at 0:00 nothing
+  // auto-submits or locks; the student keeps working and submits manually, and
+  // the actual time used is recorded.
+  softTimer?: boolean;
   questions: TimedTestQuestion[];
 };
 
@@ -83,6 +87,24 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
       "20 multiple-choice questions on exponential functions (Topics 2.3–2.4). Type the letter of your answer for each question and show your work on the writing pad. Quick rules: a = starting multiplier (negative flips the graph), b = growth factor (b > 1 grows, 0 < b < 1 decays), k = the floor/ceiling y = k that the curve never touches. You have 40 minutes. Your work auto-saves as you type and is submitted automatically when time runs out — after that the test is locked and cannot be reopened.",
     minutes: 40,
     questions: imageSet("unit2-test-1", "q", 20, "Question"),
+  },
+  "growth-decay-drill-1": {
+    id: "growth-decay-drill-1",
+    title: "Growth / Decay Drill — Set 1",
+    description:
+      "Speed drill: 10 multiple-choice questions on growth, decay, increasing/decreasing, and concavity. Rules: type comes from a and b; concavity comes from the sign of a only; a negative a is NEITHER growth nor decay — and clean up the exponent first (3^(−x) is (1/3)^x). Type the letter of your answer; use the writing pad for work. Target time is 10 minutes, but the timer will NOT lock or auto-submit — keep going if you need to and press Submit when you're done. Your actual time is recorded.",
+    minutes: 10,
+    softTimer: true,
+    questions: imageSet("growth-decay-drill-1", "q", 10, "Question"),
+  },
+  "growth-decay-drill-2": {
+    id: "growth-decay-drill-2",
+    title: "Growth / Decay Drill — Set 2",
+    description:
+      "Speed drill, second set: 10 fresh multiple-choice questions on growth, decay, increasing/decreasing, and concavity — same rules as Set 1 (type from a and b, concavity from the sign of a only, negative a is NEITHER, clean up the exponent first). Type the letter of your answer; use the writing pad for work. Target time is 10 minutes, but the timer will NOT lock or auto-submit — keep going if you need to and press Submit when you're done. Your actual time is recorded.",
+    minutes: 10,
+    softTimer: true,
+    questions: imageSet("growth-decay-drill-2", "q", 10, "Question"),
   },
 };
 

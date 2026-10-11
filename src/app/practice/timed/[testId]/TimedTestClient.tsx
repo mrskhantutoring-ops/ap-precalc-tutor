@@ -25,6 +25,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
   const [pageCounts, setPageCounts] = useState<Record<string, number>>({});
   const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
   const [timeWarning, setTimeWarning] = useState<string | null>(null);
+  const [overSec, setOverSec] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [timeUsed, setTimeUsed] = useState<string | null>(null);
@@ -32,6 +33,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
 
   const deadlineRef = useRef<number | null>(null);
   const warnedRef = useRef({ five: false, one: false });
+  const timeUpRef = useRef(false);
   const finishedRef = useRef(false);
   const submitFailedRef = useRef(false);
   const answersRef = useRef(answers);
@@ -128,11 +130,11 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
     } finally {
       setSaving(false);
     }
-    const usedMs = deadlineRef.current ? Math.min(Date.now(), deadlineRef.current) - (deadlineRef.current - test.minutes * 60 * 1000) : 0;
+    const usedMs = deadlineRef.current ? (test.softTimer ? Date.now() : Math.min(Date.now(), deadlineRef.current)) - (deadlineRef.current - test.minutes * 60 * 1000) : 0;
     setTimeUsed(formatTime(Math.max(0, Math.round(usedMs / 1000))));
     setSecondsLeft(null);
     setPhase("submitted");
-  }, [test.id, test.minutes]);
+  }, [test.id, test.minutes, test.softTimer]);
 
   // Load any existing submission (draft or final).
   useEffect(() => {
@@ -159,7 +161,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
           setDrawings((s.drawings ?? {}) as Record<string, string>);
           setStartedAt(s.startedAt);
           deadlineRef.current = new Date(s.startedAt).getTime() + test.minutes * 60 * 1000;
-          warnedRef.current = { five: false, one: false };
+          warnedRef.current = { five: false, one: false }; timeUpRef.current = false; setOverSec(0);
           finishedRef.current = false;
           setPhase("answering");
         } else {
@@ -176,14 +178,24 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
   useEffect(() => {
     if (phase !== "answering" || deadlineRef.current === null) return;
     const tick = () => {
-      const remain = Math.max(0, Math.ceil((deadlineRef.current! - Date.now()) / 1000));
+      const raw = Math.ceil((deadlineRef.current! - Date.now()) / 1000);
+      const remain = Math.max(0, raw);
       setSecondsLeft(remain);
+      if (test.softTimer) setOverSec(Math.max(0, -raw));
       if (remain <= 300 && remain > 60 && !warnedRef.current.five) {
         warnedRef.current.five = true;
         setTimeWarning("5 minutes remaining.");
       } else if (remain <= 60 && remain > 0 && !warnedRef.current.one) {
         warnedRef.current.one = true;
         setTimeWarning("1 minute remaining — finish up!");
+      }
+      if (remain <= 0 && test.softTimer) {
+        // Soft timer: never auto-submit or lock. Warn once, then keep counting overtime.
+        if (!timeUpRef.current) {
+          timeUpRef.current = true;
+          setTimeWarning("Time's up — keep going! Submit when you're done.");
+        }
+        return;
       }
       if (remain <= 0 && !submitFailedRef.current) submitFinal();
     };
@@ -213,7 +225,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
       const now = new Date().toISOString();
       setStartedAt(now);
       deadlineRef.current = Date.now() + test.minutes * 60 * 1000;
-      warnedRef.current = { five: false, one: false };
+      warnedRef.current = { five: false, one: false }; timeUpRef.current = false; setOverSec(0);
       finishedRef.current = false;
       setPhase("answering");
       return;
@@ -236,7 +248,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
       const d = await res.json();
       setStartedAt(d.startedAt);
       deadlineRef.current = new Date(d.startedAt).getTime() + test.minutes * 60 * 1000;
-      warnedRef.current = { five: false, one: false };
+      warnedRef.current = { five: false, one: false }; timeUpRef.current = false; setOverSec(0);
       finishedRef.current = false;
       setPhase("answering");
     } catch (e) {
@@ -280,15 +292,15 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
           </div>
           <div className="flex items-center gap-3">
             <span className="text-2xl">📝</span>
-            <p><strong className="text-black">{test.questions.length} free-response questions</strong> — type your answer, or write your work by hand on the writing pad under each one. Need more room? You can add up to 2 extra writing pages under any question.</p>
+            <p>{test.softTimer ? (<><strong className="text-black">{test.questions.length} multiple-choice questions</strong> — type the letter of your answer, and use the writing pad under each question for work. Need more room? You can add up to 2 extra writing pages under any question.</>) : (<><strong className="text-black">{test.questions.length} free-response questions</strong> — type your answer, or write your work by hand on the writing pad under each one. Need more room? You can add up to 2 extra writing pages under any question.</>)}</p>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-2xl">💾</span>
-            <p>Your work <strong className="text-black">auto-saves</strong> while you type and is sent to your teacher when time runs out.</p>
+            <p>{test.softTimer ? (<>Your work <strong className="text-black">auto-saves</strong> while you type. Nothing is sent to your teacher until you press Submit.</>) : (<>Your work <strong className="text-black">auto-saves</strong> while you type and is sent to your teacher when time runs out.</>)}</p>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-2xl">🔒</span>
-            <p>Once submitted (or when time expires), the test <strong className="text-black">locks</strong> — you can't reopen or change it.</p>
+            <p>{test.softTimer ? (<>The timer is a <strong className="text-black">target only</strong> — at zero you can keep working, and the drill <strong className="text-black">never locks</strong>. Press Submit when you're done; your actual time is recorded.</>) : (<>Once submitted (or when time expires), the test <strong className="text-black">locks</strong> — you can't reopen or change it.</>)}</p>
           </div>
         </div>
         {error && <p className="text-sm text-red-600">{error}</p>}
@@ -387,8 +399,8 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
             {answeredCount} / {test.questions.length} <span className="font-medium text-slate-500">answered</span>
           </p>
           {secondsLeft !== null && (
-            <p className={`rounded-full px-4 py-1.5 font-mono font-bold ${secondsLeft < 60 ? "bg-red-100 text-red-700" : secondsLeft < 300 ? "bg-amber-100 text-amber-800" : "bg-slate-100 text-slate-700"}`}>
-              ⏱ {formatTime(secondsLeft)}
+            <p className={`rounded-full px-4 py-1.5 font-mono font-bold ${test.softTimer && overSec > 0 ? "bg-red-100 text-red-700" : secondsLeft < 60 ? "bg-red-100 text-red-700" : secondsLeft < 300 ? "bg-amber-100 text-amber-800" : "bg-slate-100 text-slate-700"}`}>
+              ⏱ {test.softTimer && overSec > 0 ? `+${formatTime(overSec)} over` : formatTime(secondsLeft)}
             </p>
           )}
           <p className="hidden text-xs text-slate-400 sm:block">{preview ? "Preview — not saved" : saving ? "Saving…" : "Auto-saved"}</p>
