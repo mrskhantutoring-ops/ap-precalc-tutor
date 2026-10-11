@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { UNITS, sectionsByUnit, sectionLabel } from "@/lib/site";
+import { TIMED_TESTS } from "@/lib/timedTests";
 
 export const dynamic = "force-dynamic";
 
@@ -66,6 +67,43 @@ export async function GET() {
     })
   );
 
+  // Timed tests & drills: the student's submissions, newest first. Click-MCQ
+  // drills get an auto score from the saved answer letters; free-response
+  // tests report how many questions were answered (they are hand-graded).
+  const subs = await db.timedSubmission.findMany({
+    where: { userId: user.id },
+    orderBy: { startedAt: "desc" },
+    take: 20,
+  });
+  const LETTERS = "ABCDEFGH";
+  const timed = subs.map((s) => {
+    const test = TIMED_TESTS[s.testId];
+    const answers = (s.answers ?? {}) as Record<string, string>;
+    const drawings = (s.drawings ?? {}) as Record<string, string>;
+    const totalQ = test?.questions.length ?? Object.keys(answers).length;
+    const answered = test
+      ? test.questions.filter((q) => answers[q.key]?.trim() || drawings[q.key] || drawings[`${q.key}_pg2`] || drawings[`${q.key}_pg3`]).length
+      : Object.keys(answers).length;
+    let score: { correct: number; total: number } | null = null;
+    if (test?.mcq) {
+      const correctCount = test.questions.filter(
+        (q, i) => (answers[q.key] ?? "").trim().toUpperCase() === LETTERS[test.mcq![i].answer]
+      ).length;
+      score = { correct: correctCount, total: test.mcq.length };
+    }
+    return {
+      testId: s.testId,
+      title: test?.title ?? s.testId,
+      final: s.final,
+      startedAt: s.startedAt,
+      finishedAt: s.finishedAt,
+      timeMs: s.timeMs,
+      answered,
+      questionsTotal: totalQ,
+      score,
+    };
+  });
+
   return NextResponse.json({
     totals: { attempts: total, correct, accuracy: pct(correct, total) },
     bySubject: UNITS.map((u) => {
@@ -81,5 +119,6 @@ export async function GET() {
         prompt: a.question.prompt,
       },
     })),
+    timed,
   });
 }

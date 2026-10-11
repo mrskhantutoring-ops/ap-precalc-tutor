@@ -10,7 +10,17 @@ type Progress = {
   bySubject: { subject: string; attempts: number; correct: number; accuracy: number }[];
   sections: { subject: string; subjectShort: string; section: string; label: string; attempts: number; correct: number; accuracy: number | null }[];
   recent: { id: string; correct: boolean; createdAt: string; question: { subject: string; section: string | null; prompt: string } }[];
+  timed: {
+    testId: string; title: string; final: boolean; startedAt: string; finishedAt: string | null;
+    timeMs: number | null; answered: number; questionsTotal: number;
+    score: { correct: number; total: number } | null;
+  }[];
 };
+
+function fmtDuration(ms: number) {
+  const s = Math.round(ms / 1000);
+  return `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`;
+}
 
 export default function Dashboard() {
   return (
@@ -33,7 +43,7 @@ function DashboardInner() {
       .then((d) => {
         if (!d) return;
         setData(d);
-        setStatus(d.totals.attempts === 0 ? "empty" : "ready");
+        setStatus(d.totals.attempts === 0 && (d.timed?.length ?? 0) === 0 ? "empty" : "ready");
       })
       .catch(() => setStatus("login"));
   }, []);
@@ -112,6 +122,45 @@ function DashboardInner() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="space-y-4">
+        <h2 className="text-xl font-bold">Timed tests &amp; drills</h2>
+        {data.timed.length === 0 ? (
+          <div className="card !p-4 text-sm text-slate-500">
+            No timed tests yet — you&apos;ll find them under Practice → Timed tests.
+          </div>
+        ) : (
+          <div className="grid gap-3 sm:grid-cols-2">
+            {data.timed.map((t) => {
+              const pctScore = t.score ? Math.round((t.score.correct / t.score.total) * 100) : null;
+              const when = new Date(t.finishedAt ?? t.startedAt);
+              return (
+                <div key={t.testId + t.startedAt} className="card !p-4">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-sm font-bold">{t.title}</p>
+                    {!t.final ? (
+                      <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-800">In progress</span>
+                    ) : pctScore !== null ? (
+                      <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-bold ${pctScore >= 80 ? "bg-green-100 text-green-700" : pctScore >= 60 ? "bg-amber-100 text-amber-800" : "bg-red-100 text-red-700"}`}>
+                        {pctScore}%
+                      </span>
+                    ) : (
+                      <span className="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-600">Submitted</span>
+                    )}
+                  </div>
+                  <p className="mt-1 text-xs text-slate-500">
+                    {when.toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                    {t.timeMs != null && <> · {fmtDuration(t.timeMs)} used</>}
+                    {t.score
+                      ? <> · {t.score.correct}/{t.score.total} correct</>
+                      : <> · {t.answered}/{t.questionsTotal} answered</>}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </section>
 
       <section className="space-y-3">

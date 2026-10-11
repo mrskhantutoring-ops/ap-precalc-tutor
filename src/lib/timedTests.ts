@@ -127,10 +127,10 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
     id: "growth-decay-drill-3",
     title: "Growth / Decay Drill — Set 3 (Asymptote & Range)",
     description:
-      "Speed drill, third set: 20 multiple-choice questions on horizontal asymptotes, range, and end behavior of exponential functions — including negative-a functions (the range can run DOWNWARD from the asymptote), shifts, comparing two functions' directions, reading the trend from f(0) and f(1), and describing how a function behaves as x grows large in either direction, with extra practice on negative-a end behavior. Click the correct answer — you get instant feedback on every question, plus a hint if you want one and an explanation once you answer. No writing needed. Target time is 10 minutes, but the timer will NOT lock or auto-submit — keep going if you need to and press Submit when you're done. Your actual time is recorded.",
+      "Speed drill, third set: 22 multiple-choice questions on horizontal asymptotes, range, and end behavior of exponential functions — including negative-a functions (the range can run DOWNWARD from the asymptote), shifts, comparing two functions' directions, reading the trend from f(0) and f(1), and describing how a function behaves as x grows large in either direction, with extra practice on negative-a end behavior. Click the correct answer — you get instant feedback on every question, plus a hint if you want one and an explanation once you answer. No writing needed. Target time is 10 minutes, but the timer will NOT lock or auto-submit — keep going if you need to and press Submit when you're done. Your actual time is recorded.",
     minutes: 10,
     softTimer: true,
-    questions: imageSet("growth-decay-drill-3", "q", 20, "Question"),
+    questions: imageSet("growth-decay-drill-3", "q", 22, "Question"),
     mcq: growthDecayDrill3,
   },
 };

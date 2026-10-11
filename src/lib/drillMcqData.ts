@@ -489,6 +489,30 @@ export const growthDecayDrill3: McqItem[] = [
     "answer": 2,
     "hint": "Follow the base first as x moves: b > 1 explodes, 0 < b < 1 dies to 0. Then let the sign of a (and any +k shift) place the values.",
     "explanation": "As x→∞, 0 < b = 0.1 < 1, so b^x dies toward 0 as x→∞, and a = −9 keeps the shrinking part negative, so the values climb up to the asymptote y = −3 from below."
+  },
+  {
+    "stem": "Consider the exponential function f(x) = −2(4)^{x} + 3. Which of the following statements correctly describes the concavity and left-end behavior of f(x)?",
+    "choices": [
+      "The function is concave down, and lim x→−∞ f(x) = −∞.",
+      "The function is concave up, and lim x→−∞ f(x) = 0.",
+      "The function is concave down, and lim x→−∞ f(x) = 3.",
+      "The function is concave up, and lim x→−∞ f(x) = 3."
+    ],
+    "answer": 2,
+    "hint": "Two separate checks: concavity is the sign of a only. For the LEFT end, ask what b^x does as x→−∞: if b > 1 it dies to 0 (leaving k); if 0 < b < 1 it explodes.",
+    "explanation": "Concavity: the sign of a alone decides — a = −2 < 0, so the graph is concave down. Left end: as x→−∞, (4)^x dies toward 0, so the a·b^x part vanishes and f settles onto the shift: lim x→−∞ f(x) = 3. (The dive to −∞ for this function happens at the RIGHT end, not the left.)"
+  },
+  {
+    "stem": "Consider the exponential function f(x) = 4(0.5)^{x} − 1. Which of the following statements correctly describes the concavity and left-end behavior of f(x)?",
+    "choices": [
+      "The function is concave up, and lim x→−∞ f(x) = ∞.",
+      "The function is concave up, and lim x→−∞ f(x) = −1.",
+      "The function is concave down, and lim x→−∞ f(x) = ∞.",
+      "The function is concave down, and lim x→−∞ f(x) = −1."
+    ],
+    "answer": 0,
+    "hint": "Two separate checks: concavity is the sign of a only. For the LEFT end, ask what b^x does as x→−∞: if b > 1 it dies to 0 (leaving k); if 0 < b < 1 it explodes.",
+    "explanation": "Concavity: the sign of a alone decides — a = 4 > 0, so the graph is concave up. Left end: 0 < b = 1/2 < 1, so as x→−∞ the b^x part explodes to ∞, and a = 4 keeps the values positive — lim x→−∞ f(x) = ∞. (−1 is where this graph settles at the RIGHT end instead.)"
   }
 ];
 
