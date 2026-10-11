@@ -106,6 +106,15 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
     softTimer: true,
     questions: imageSet("growth-decay-drill-2", "q", 10, "Question"),
   },
+  "growth-decay-drill-3": {
+    id: "growth-decay-drill-3",
+    title: "Growth / Decay Drill — Set 3 (Asymptote & Range)",
+    description:
+      "Speed drill, third set: 10 multiple-choice questions on horizontal asymptotes, range, and end behavior of exponential functions — including negative-a functions (the range can run DOWNWARD from the asymptote) and shifts. Type the letter of your answer; use the writing pad for work. Target time is 10 minutes, but the timer will NOT lock or auto-submit — keep going if you need to and press Submit when you're done. Your actual time is recorded.",
+    minutes: 10,
+    softTimer: true,
+    questions: imageSet("growth-decay-drill-3", "q", 10, "Question"),
+  },
 };
 
 export function timedTestById(id: string): TimedTest | null {
