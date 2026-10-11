@@ -25,7 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         <Navbar />
         <main className="mx-auto max-w-6xl px-4 pb-20 pt-8">{children}</main>
-        <footer className="bg-black text-slate-300">
+        <footer className="bg-[#073c59] text-slate-300">
           <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 text-sm sm:grid-cols-4">
             <div>
               <p className="text-lg font-extrabold text-white">{site.name}</p>
@@ -62,7 +62,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </p>
             </div>
           </div>
-          <div className="bg-[#3F3A38]">
+          <div className="bg-[#0a4a6e]">
             <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-4 py-4 text-sm text-white sm:flex-row">
               <p>© {new Date().getFullYear()} {site.name}</p>
               <p className="flex gap-4">

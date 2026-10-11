@@ -49,7 +49,7 @@ export default function Navbar() {
               </button>
             </span>
           ) : (
-            <Link href="/login" className="ml-1 rounded-full bg-black px-4 py-2 font-semibold text-white hover:bg-[#3F3A38]">
+            <Link href="/login" className="ml-1 rounded-full bg-[#073c59] px-4 py-2 font-semibold text-white hover:bg-[#0a4a6e]">
               Log in
             </Link>
           )}

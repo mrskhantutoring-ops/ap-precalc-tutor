@@ -30,7 +30,7 @@ export default function Home() {
       {/* Hero */}
       <section className="hero-pattern relative left-1/2 -mt-8 w-screen -translate-x-1/2 px-4 py-16 text-center sm:py-20">
         <div className="mx-auto max-w-6xl">
-        <span className="inline-block rounded-full bg-white px-4 py-1.5 text-sm font-semibold text-[#1a46b0]">
+        <span className="inline-block rounded-full bg-white px-4 py-1.5 text-sm font-semibold text-[#073c59]">
           For enrolled Pro Minds students
         </span>
         <h1 className="mx-auto mt-5 max-w-3xl text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-6xl">
@@ -42,14 +42,14 @@ export default function Home() {
         <div className="mt-8">
           <a
             href="#units"
-            className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-3.5 text-lg font-bold text-[#1a46b0] transition hover:bg-slate-100"
+            className="inline-flex items-center gap-2 rounded-full bg-[#f5b800] px-8 py-3.5 text-lg font-bold text-[#073c59] transition hover:bg-[#ffd02e]"
           >
             Start practicing <span aria-hidden>→</span>
           </a>
         </div>
         <div className="mx-auto mt-10 max-w-2xl rounded-2xl bg-white p-6 text-left">
           <ul className="space-y-2.5 text-slate-700">
-            <li>✅ <strong>79 original questions</strong> across all 4 AP Precalculus units</li>
+            <li>✅ <strong>261 original questions</strong> across all 4 AP Precalculus units</li>
             <li>✅ <strong>Instant explanations</strong> after every single question</li>
             <li>✅ <strong>Timed exam sets</strong> that mirror the real AP pacing</li>
           </ul>
@@ -139,9 +139,9 @@ export default function Home() {
         </div>
         <div className="grid gap-5 md:grid-cols-3">
           {site.pricing.map((p) => (
-            <div key={p.name} className={`card flex flex-col ${p.featured ? "!border-black border-2" : ""}`}>
+            <div key={p.name} className={`card flex flex-col ${p.featured ? "!border-[#073c59] border-2" : ""}`}>
               {p.featured && (
-                <span className="mb-2 w-fit rounded-full bg-black px-3 py-1 text-xs font-bold text-white">MOST POPULAR</span>
+                <span className="mb-2 w-fit rounded-full bg-[#073c59] px-3 py-1 text-xs font-bold text-white">MOST POPULAR</span>
               )}
               <h3 className="text-lg font-bold">{p.name}</h3>
               <p className="mt-1 text-3xl font-extrabold text-black">{p.price}</p>
@@ -175,7 +175,7 @@ export default function Home() {
       </section>
 
       {/* CTA */}
-      <section className="rounded-2xl bg-black px-6 py-14 text-center text-white">
+      <section className="rounded-2xl bg-[#073c59] px-6 py-14 text-center text-white">
         <h2 className="text-3xl font-extrabold">Ready when you are.</h2>
         <p className="mx-auto mt-2 max-w-xl text-slate-300">
           Enroll now to unlock AP-style practice, or book a free intro call and get a plan built around the May exam.
