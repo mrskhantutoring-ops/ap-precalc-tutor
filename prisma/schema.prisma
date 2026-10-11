@@ -46,6 +46,7 @@ model Question {
   correctIndex Int?     // index into choices for multiple-choice
   correctText  String   // canonical correct answer (also used for grid-in checking)
   explanation  String   @db.Text
+  hint         String?  @db.Text
   createdAt    DateTime @default(now())
   attempts     Attempt[]
 

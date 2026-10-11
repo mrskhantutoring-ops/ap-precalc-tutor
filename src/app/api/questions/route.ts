@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
     },
     select: {
       id: true, subject: true, section: true, title: true, image: true, difficulty: true,
-      prompt: true, choices: true, correctIndex: true, correctText: true, explanation: true,
+      prompt: true, choices: true, correctIndex: true, correctText: true, explanation: true, hint: true,
     },
     orderBy: { id: "asc" },
   });

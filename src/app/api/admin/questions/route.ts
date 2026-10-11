@@ -27,6 +27,7 @@ export async function POST(req: NextRequest) {
   const difficulty = String(body?.difficulty ?? "medium").trim();
   const prompt = String(body?.prompt ?? "").trim();
   const explanation = String(body?.explanation ?? "").trim();
+  const hint = String(body?.hint ?? "").trim() || null;
   const correctText = String(body?.correctText ?? "").trim();
   const choices = Array.isArray(body?.choices) && body.choices.length ? body.choices.map(String) : null;
   const correctIndex = choices !== null && Number.isInteger(body?.correctIndex) ? body.correctIndex : null;
@@ -42,7 +43,7 @@ export async function POST(req: NextRequest) {
   }
 
   const q = await db.question.create({
-    data: { subject, section, title, image, difficulty, prompt, choices: choices ?? undefined, correctIndex, correctText, explanation },
+    data: { subject, section, title, image, difficulty, prompt, choices: choices ?? undefined, correctIndex, correctText, explanation, hint },
   });
   return NextResponse.json({ ok: true, question: q });
 }

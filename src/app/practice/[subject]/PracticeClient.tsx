@@ -17,6 +17,7 @@ type Question = {
   correctIndex: number | null;
   correctText: string;
   explanation: string;
+  hint: string | null;
 };
 
 type Phase = "setup" | "answering" | "results";
@@ -99,6 +100,7 @@ export default function PracticeClient({
   const [selected, setSelected] = useState<number | null>(null);
   const [gridAnswer, setGridAnswer] = useState("");
   const [checked, setChecked] = useState(false);
+  const [showHint, setShowHint] = useState(false);
   const [answers, setAnswers] = useState<{ id: string; correct: boolean; timeMs: number }[]>([]);
   const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
   const [timeWarning, setTimeWarning] = useState<string | null>(null);
@@ -113,6 +115,7 @@ export default function PracticeClient({
 
   // Drill mode state: every question stacked on one page, one click answers.
   const [drillAnswers, setDrillAnswers] = useState<Record<string, { selected: number; correct: boolean }>>({});
+  const [shownHints, setShownHints] = useState<Record<string, boolean>>({});
   const drillAttempts = useRef<{ id: string; correct: boolean; timeMs: number }[]>([]);
   const drillStartRef = useRef<number>(Date.now());
 
@@ -204,6 +207,7 @@ export default function PracticeClient({
       setIndex(0);
       setAnswers([]);
       setChecked(false);
+      setShowHint(false);
       setSelected(null);
       setGridAnswer("");
       setTimeWarning(null);
@@ -211,6 +215,7 @@ export default function PracticeClient({
       finishedRef.current = false;
       // Drill reset
       setDrillAnswers({});
+      setShownHints({});
       drillAttempts.current = [];
       drillStartRef.current = Date.now();
       if (timed) {
@@ -253,6 +258,7 @@ export default function PracticeClient({
     setSelected(null);
     setGridAnswer("");
     setChecked(false);
+    setShowHint(false);
     questionStart.current = Date.now();
   }
 
@@ -432,6 +438,17 @@ export default function PracticeClient({
                   <img src={qq.image} alt="Graph for this question" className="mt-4 w-full max-w-2xl rounded-xl border border-slate-200 bg-white" />
                 )}
 
+                {qq.hint && !answered && (
+                  <div className="mt-3">
+                    <button type="button" onClick={() => setShownHints((m) => ({ ...m, [qq.id]: !m[qq.id] }))} className="text-base font-semibold text-amber-700 underline decoration-dotted underline-offset-4">
+                      💡 {shownHints[qq.id] ? "Hide hint" : "Show hint"}
+                    </button>
+                    {shownHints[qq.id] && (
+                      <p className="mt-2 rounded-xl bg-amber-50 px-4 py-3 text-base text-amber-900"><MathText text={qq.hint} /></p>
+                    )}
+                  </div>
+                )}
+
                 {isMcq ? (
                   <div className="mt-4 space-y-2">
                     {qq.choices!.map((c, i) => {
@@ -553,6 +570,17 @@ export default function PracticeClient({
         <p className="text-xl leading-relaxed md:text-2xl"><MathText text={q.prompt} /></p>
         {q.image && (
           <img src={q.image} alt="Graph for this question" className="mt-4 w-full max-w-2xl rounded-xl border border-slate-200 bg-white" />
+        )}
+
+        {q.hint && !checked && (
+          <div>
+            <button type="button" onClick={() => setShowHint((s) => !s)} className="text-base font-semibold text-amber-700 underline decoration-dotted underline-offset-4">
+              💡 {showHint ? "Hide hint" : "Show hint"}
+            </button>
+            {showHint && (
+              <p className="mt-2 rounded-xl bg-amber-50 px-4 py-3 text-base text-amber-900"><MathText text={q.hint} /></p>
+            )}
+          </div>
         )}
 
         {isMcq ? (

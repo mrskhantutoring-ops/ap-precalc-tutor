@@ -16,6 +16,7 @@ type Question = {
   correctIndex: number | null;
   correctText: string;
   explanation: string;
+  hint: string | null;
 };
 
 type Inquiry = {
@@ -90,6 +91,7 @@ const emptyForm = {
   correctIndex: "",
   correctText: "",
   explanation: "",
+  hint: "",
 };
 
 export default function Admin() {
@@ -161,6 +163,7 @@ export default function Admin() {
       correctIndex: q.correctIndex !== null ? String(q.correctIndex) : "",
       correctText: q.correctText,
       explanation: q.explanation,
+      hint: q.hint ?? "",
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -180,6 +183,7 @@ export default function Admin() {
       correctIndex: choices ? Number(form.correctIndex) : null,
       correctText: form.correctText,
       explanation: form.explanation,
+      hint: form.hint,
     };
     const res = await fetch(editingId ? `/api/admin/questions/${editingId}` : "/api/admin/questions", {
       method: editingId ? "PUT" : "POST",
@@ -386,6 +390,10 @@ export default function Admin() {
             <div>
               <label className="label">Explanation</label>
               <textarea className="input min-h-24" required value={form.explanation} onChange={(e) => setForm({ ...form, explanation: e.target.value })} />
+            </div>
+            <div>
+              <label className="label">Hint (optional — students can reveal it before answering)</label>
+              <textarea className="input min-h-16" value={form.hint} onChange={(e) => setForm({ ...form, hint: e.target.value })} />
             </div>
             <div className="flex gap-3">
               <button className="btn-primary">{editingId ? "Update" : "Add"} question</button>
