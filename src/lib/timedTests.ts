@@ -7,6 +7,14 @@ export type TimedTestQuestion = {
   image: string; // public path to the worksheet page image
 };
 
+export type McqItem = {
+  stem: string;
+  choices: string[];
+  answer: number; // index into choices
+  hint: string;
+  explanation: string;
+};
+
 export type TimedTest = {
   id: string;
   title: string;
@@ -17,7 +25,14 @@ export type TimedTest = {
   // the actual time used is recorded.
   softTimer?: boolean;
   questions: TimedTestQuestion[];
+  // Click-MCQ mode: when present (parallel to questions), the player renders
+  // tappable choices with instant right/wrong feedback, a hint, and an
+  // explanation per question — no typing, no writing pad. The picked letter
+  // is still saved through the normal answers pipeline.
+  mcq?: McqItem[];
 };
+
+import { growthDecayDrill1, growthDecayDrill2, growthDecayDrill3 } from "./drillMcqData";
 
 function imageSet(testId: string, dir: string, count: number, label: string): TimedTestQuestion[] {
   return Array.from({ length: count }, (_, i) => ({
@@ -92,28 +107,31 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
     id: "growth-decay-drill-1",
     title: "Growth / Decay Drill — Set 1",
     description:
-      "Speed drill: 10 multiple-choice questions on growth, decay, increasing/decreasing, and concavity. Rules: type comes from a and b; concavity comes from the sign of a only; a negative a is NEITHER growth nor decay — and clean up the exponent first (3^(−x) is (1/3)^x). Type the letter of your answer; use the writing pad for work. Target time is 10 minutes, but the timer will NOT lock or auto-submit — keep going if you need to and press Submit when you're done. Your actual time is recorded.",
+      "Speed drill: 10 multiple-choice questions on growth, decay, increasing/decreasing, and concavity. Rules: type comes from a and b; concavity comes from the sign of a only; a negative a is NEITHER growth nor decay — and clean up the exponent first (3^(−x) is (1/3)^x). Click the correct answer — you get instant feedback on every question, plus a hint if you want one and an explanation once you answer. No writing needed. Target time is 10 minutes, but the timer will NOT lock or auto-submit — keep going if you need to and press Submit when you're done. Your actual time is recorded.",
     minutes: 10,
     softTimer: true,
     questions: imageSet("growth-decay-drill-1", "q", 10, "Question"),
+    mcq: growthDecayDrill1,
   },
   "growth-decay-drill-2": {
     id: "growth-decay-drill-2",
     title: "Growth / Decay Drill — Set 2",
     description:
-      "Speed drill, second set: 10 fresh multiple-choice questions on growth, decay, increasing/decreasing, and concavity — same rules as Set 1 (type from a and b, concavity from the sign of a only, negative a is NEITHER, clean up the exponent first). Type the letter of your answer; use the writing pad for work. Target time is 10 minutes, but the timer will NOT lock or auto-submit — keep going if you need to and press Submit when you're done. Your actual time is recorded.",
+      "Speed drill, second set: 10 fresh multiple-choice questions on growth, decay, increasing/decreasing, and concavity — same rules as Set 1 (type from a and b, concavity from the sign of a only, negative a is NEITHER, clean up the exponent first). Click the correct answer — you get instant feedback on every question, plus a hint if you want one and an explanation once you answer. No writing needed. Target time is 10 minutes, but the timer will NOT lock or auto-submit — keep going if you need to and press Submit when you're done. Your actual time is recorded.",
     minutes: 10,
     softTimer: true,
     questions: imageSet("growth-decay-drill-2", "q", 10, "Question"),
+    mcq: growthDecayDrill2,
   },
   "growth-decay-drill-3": {
     id: "growth-decay-drill-3",
     title: "Growth / Decay Drill — Set 3 (Asymptote & Range)",
     description:
-      "Speed drill, third set: 20 multiple-choice questions on horizontal asymptotes, range, and end behavior of exponential functions — including negative-a functions (the range can run DOWNWARD from the asymptote), shifts, comparing two functions' directions, reading the trend from f(0) and f(1), and describing how a function behaves as x grows large in either direction, with extra practice on negative-a end behavior. Type the letter of your answer; use the writing pad for work. Target time is 10 minutes, but the timer will NOT lock or auto-submit — keep going if you need to and press Submit when you're done. Your actual time is recorded.",
+      "Speed drill, third set: 20 multiple-choice questions on horizontal asymptotes, range, and end behavior of exponential functions — including negative-a functions (the range can run DOWNWARD from the asymptote), shifts, comparing two functions' directions, reading the trend from f(0) and f(1), and describing how a function behaves as x grows large in either direction, with extra practice on negative-a end behavior. Click the correct answer — you get instant feedback on every question, plus a hint if you want one and an explanation once you answer. No writing needed. Target time is 10 minutes, but the timer will NOT lock or auto-submit — keep going if you need to and press Submit when you're done. Your actual time is recorded.",
     minutes: 10,
     softTimer: true,
     questions: imageSet("growth-decay-drill-3", "q", 20, "Question"),
+    mcq: growthDecayDrill3,
   },
 };
 

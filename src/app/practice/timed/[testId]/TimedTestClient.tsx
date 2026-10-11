@@ -13,6 +13,24 @@ function formatTime(s: number) {
   return `${m}:${r.toString().padStart(2, "0")}`;
 }
 
+const LETTERS = "ABCDEFGH";
+
+// Render plain-text math: ^{...}, ^(...), and ^x become superscripts.
+function renderMath(text: string) {
+  const token = /\^\{([^}]*)\}|\^\(([^)]*)\)|\^([A-Za-z0-9∞+\-−])/g;
+  const out: React.ReactNode[] = [];
+  let last = 0;
+  let m: RegExpExecArray | null;
+  let k = 0;
+  while ((m = token.exec(text)) !== null) {
+    if (m.index > last) out.push(<span key={k++}>{text.slice(last, m.index)}</span>);
+    out.push(<sup key={k++}>{m[1] ?? m[2] ?? m[3]}</sup>);
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) out.push(<span key={k++}>{text.slice(last)}</span>);
+  return out;
+}
+
 export default function TimedTestClient({ test, preview = false }: { test: TimedTest; preview?: boolean }) {
   const previewBanner = preview ? (
     <p className="rounded-xl bg-amber-100 px-4 py-2 text-center text-sm font-semibold text-amber-800">
@@ -21,6 +39,8 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
   ) : null;
   const [phase, setPhase] = useState<Phase>("loading");
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [picks, setPicks] = useState<Record<string, number>>({});
+  const [hintsOpen, setHintsOpen] = useState<Record<string, boolean>>({});
   const [drawings, setDrawings] = useState<Record<string, string>>({});
   const [pageCounts, setPageCounts] = useState<Record<string, number>>({});
   const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
@@ -104,6 +124,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
         const s = d?.submission;
         if (s) {
           setAnswers((s.answers ?? {}) as Record<string, string>);
+          setPicks(picksFromAnswers((s.answers ?? {}) as Record<string, string>));
           setDrawings((s.drawings ?? {}) as Record<string, string>);
           setStartedAt(s.startedAt ?? null);
           setTimeUsed(s.timeMs != null ? formatTime(Math.round(s.timeMs / 1000)) : null);
@@ -151,6 +172,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
         const s = d.submission;
         if (s?.final) {
           setAnswers((s.answers ?? {}) as Record<string, string>);
+          setPicks(picksFromAnswers((s.answers ?? {}) as Record<string, string>));
           setDrawings((s.drawings ?? {}) as Record<string, string>);
           setStartedAt(s.startedAt ?? null);
           setTimeUsed(s.timeMs != null ? formatTime(Math.round(s.timeMs / 1000)) : null);
@@ -158,6 +180,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
         } else if (s?.startedAt) {
           // Resume an in-progress draft
           setAnswers((s.answers ?? {}) as Record<string, string>);
+          setPicks(picksFromAnswers((s.answers ?? {}) as Record<string, string>));
           setDrawings((s.drawings ?? {}) as Record<string, string>);
           setStartedAt(s.startedAt);
           deadlineRef.current = new Date(s.startedAt).getTime() + test.minutes * 60 * 1000;
@@ -261,6 +284,26 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
     setAnswers((a) => ({ ...a, [key]: value }));
   }
 
+  // Click-MCQ: restore pick state from saved answer letters (drafts/finals).
+  const picksFromAnswers = useCallback(
+    (ans: Record<string, string>) => {
+      if (!test.mcq) return {};
+      const out: Record<string, number> = {};
+      test.questions.forEach((q) => {
+        const idx = LETTERS.indexOf((ans[q.key] ?? "").trim().toUpperCase());
+        if (idx >= 0) out[q.key] = idx;
+      });
+      return out;
+    },
+    [test.mcq, test.questions]
+  );
+
+  function pickAnswer(key: string, idx: number) {
+    if (picks[key] !== undefined) return; // one attempt per question
+    setPicks((p) => ({ ...p, [key]: idx }));
+    setAnswer(key, LETTERS[idx]);
+  }
+
   function setDrawing(key: string, value: string | null) {
     dirtyRef.current = true;
     dirtyDrawingsRef.current.add(key);
@@ -292,7 +335,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
           </div>
           <div className="flex items-center gap-3">
             <span className="text-2xl">📝</span>
-            <p>{test.softTimer ? (<><strong className="text-black">{test.questions.length} multiple-choice questions</strong> — type the letter of your answer, and use the writing pad under each question for work. Need more room? You can add up to 2 extra writing pages under any question.</>) : (<><strong className="text-black">{test.questions.length} free-response questions</strong> — type your answer, or write your work by hand on the writing pad under each one. Need more room? You can add up to 2 extra writing pages under any question.</>)}</p>
+            <p>{test.mcq ? (<><strong className="text-black">{test.questions.length} multiple-choice questions</strong> — click the correct answer for each one. You get instant feedback on every question, plus a hint if you want it and an explanation once you answer. No writing needed.</>) : test.softTimer ? (<><strong className="text-black">{test.questions.length} multiple-choice questions</strong> — type the letter of your answer, and use the writing pad under each question for work. Need more room? You can add up to 2 extra writing pages under any question.</>) : (<><strong className="text-black">{test.questions.length} free-response questions</strong> — type your answer, or write your work by hand on the writing pad under each one. Need more room? You can add up to 2 extra writing pages under any question.</>)}</p>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-2xl">💾</span>
@@ -326,13 +369,38 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
           {timeUsed && (
             <p className="mt-3 font-mono text-lg font-bold">Time used: {timeUsed}</p>
           )}
+          {test.mcq && (
+            <p className="mt-1 text-lg font-bold text-emerald-600">
+              Score: {test.questions.filter((q, i) => picks[q.key] === test.mcq![i].answer).length} / {test.questions.length} correct
+            </p>
+          )}
           {startedAt && (
             <p className="mt-1 text-xs text-slate-400">Started {new Date(startedAt).toLocaleString()}</p>
           )}
         </div>
         <div className="space-y-3">
           <h2 className="font-bold">What you submitted</h2>
-          {test.questions.map((q) => (
+          {test.questions.map((q, qi) => test.mcq ? (
+          <div key={q.key} className="card !p-4">
+            <p className="text-sm font-bold">{q.label}</p>
+            <p className="mt-1 text-sm font-medium text-slate-800">{renderMath(test.mcq[qi].stem)}</p>
+            {picks[q.key] === undefined ? (
+              <p className="mt-2 text-sm italic text-slate-400">(no answer)</p>
+            ) : (
+              <>
+                <p className={`mt-2 text-sm font-semibold ${picks[q.key] === test.mcq[qi].answer ? "text-emerald-600" : "text-red-600"}`}>
+                  Your answer: ({LETTERS[picks[q.key]]}) {renderMath(test.mcq[qi].choices[picks[q.key]])} {picks[q.key] === test.mcq[qi].answer ? "✓" : "✗"}
+                </p>
+                {picks[q.key] !== test.mcq[qi].answer && (
+                  <p className="mt-1 text-sm font-semibold text-emerald-600">
+                    Correct answer: ({LETTERS[test.mcq[qi].answer]}) {renderMath(test.mcq[qi].choices[test.mcq[qi].answer])}
+                  </p>
+                )}
+                <p className="mt-1 text-sm leading-relaxed text-slate-600">{renderMath(test.mcq[qi].explanation)}</p>
+              </>
+            )}
+          </div>
+        ) : (
             <div key={q.key} className="card !p-4">
               <p className="text-sm font-bold">{q.label}</p>
               <p className="mt-1 whitespace-pre-wrap text-sm text-slate-600">
@@ -383,6 +451,10 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
       drawings[`${q.key}_pg3`]
   ).length;
 
+  const correctCount = test.mcq
+    ? test.questions.filter((q, i) => picks[q.key] === test.mcq![i].answer).length
+    : 0;
+
   return (
     <div className="mx-auto max-w-3xl">
       {previewBanner}
@@ -397,6 +469,9 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-3">
           <p className="text-sm font-bold text-black">
             {answeredCount} / {test.questions.length} <span className="font-medium text-slate-500">answered</span>
+            {test.mcq && answeredCount > 0 && (
+              <span className="ml-2 font-medium text-emerald-600">· {correctCount} correct</span>
+            )}
           </p>
           {secondsLeft !== null && (
             <p className={`rounded-full px-4 py-1.5 font-mono font-bold ${test.softTimer && overSec > 0 ? "bg-red-100 text-red-700" : secondsLeft < 60 ? "bg-red-100 text-red-700" : secondsLeft < 300 ? "bg-amber-100 text-amber-800" : "bg-slate-100 text-slate-700"}`}>
@@ -411,7 +486,65 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
       </div>
 
       <div className="space-y-6 pt-6">
-        {test.questions.map((q) => (
+        {test.questions.map((q, qi) => test.mcq ? (
+          <div key={q.key} className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">
+            <span className="inline-block rounded-full bg-slate-100 px-3 py-1 text-sm font-bold uppercase tracking-wide text-slate-500">
+              {q.label}
+            </span>
+            <p className="mt-3 text-lg font-semibold leading-relaxed text-slate-900">{renderMath(test.mcq[qi].stem)}</p>
+            <div className="mt-4 space-y-2">
+              {test.mcq[qi].choices.map((choice, ci) => {
+                const pick = picks[q.key];
+                const done = pick !== undefined;
+                const isPick = pick === ci;
+                const isAnswer = test.mcq![qi].answer === ci;
+                const cls = !done
+                  ? "border-slate-200 bg-white hover:border-slate-400 hover:bg-slate-50"
+                  : isAnswer
+                    ? "border-emerald-500 bg-emerald-50"
+                    : isPick
+                      ? "border-red-400 bg-red-50"
+                      : "border-slate-200 bg-white opacity-60";
+                return (
+                  <button
+                    key={ci}
+                    type="button"
+                    disabled={done}
+                    onClick={() => pickAnswer(q.key, ci)}
+                    className={`flex w-full items-start gap-3 rounded-xl border-2 px-4 py-3 text-left text-base transition ${cls}`}
+                  >
+                    <span className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-sm font-bold ${done && isAnswer ? "bg-emerald-500 text-white" : done && isPick ? "bg-red-400 text-white" : "bg-slate-100 text-slate-600"}`}>
+                      {done && isAnswer ? "✓" : done && isPick ? "✗" : LETTERS[ci]}
+                    </span>
+                    <span className="leading-relaxed">{renderMath(choice)}</span>
+                  </button>
+                );
+              })}
+            </div>
+            {picks[q.key] !== undefined && (
+              <div className={`mt-4 rounded-xl p-4 ${picks[q.key] === test.mcq[qi].answer ? "bg-emerald-50" : "bg-red-50"}`}>
+                <p className={`font-bold ${picks[q.key] === test.mcq[qi].answer ? "text-emerald-700" : "text-red-700"}`}>
+                  {picks[q.key] === test.mcq[qi].answer
+                    ? "✓ Yes — correct!"
+                    : `✗ Not quite — the correct answer is (${LETTERS[test.mcq[qi].answer]}).`}
+                </p>
+                <p className="mt-1 text-sm leading-relaxed text-slate-700">{renderMath(test.mcq[qi].explanation)}</p>
+              </div>
+            )}
+            <div className="mt-4 border-t border-slate-100 pt-3">
+              <button
+                type="button"
+                onClick={() => setHintsOpen((h) => ({ ...h, [q.key]: !h[q.key] }))}
+                className="text-sm font-semibold text-amber-600 hover:text-amber-700"
+              >
+                💡 {hintsOpen[q.key] ? "Hide hint" : "Show hint"}
+              </button>
+              {hintsOpen[q.key] && (
+                <p className="mt-2 rounded-xl bg-amber-50 p-3 text-sm leading-relaxed text-amber-900">{renderMath(test.mcq[qi].hint)}</p>
+              )}
+            </div>
+          </div>
+        ) : (
           <div key={q.key} className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">
             <span className="inline-block rounded-full bg-slate-100 px-3 py-1 text-sm font-bold uppercase tracking-wide text-slate-500">
               {q.label}
