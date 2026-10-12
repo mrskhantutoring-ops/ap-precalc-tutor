@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import VisitBeacon from "@/components/VisitBeacon";
 import { site, UNITS } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -24,6 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           strategy="beforeInteractive"
         />
         <Navbar />
+        <VisitBeacon />
         <main className="mx-auto w-[min(1180px,calc(100%-40px))] pb-20 pt-8">{children}</main>
         <footer className="bg-[#073c59] text-slate-300">
           <div className="mx-auto grid w-[min(1180px,calc(100%-40px))] gap-8 py-12 text-sm sm:grid-cols-4">

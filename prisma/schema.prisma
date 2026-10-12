@@ -77,6 +77,19 @@ model Inquiry {
   createdAt DateTime @default(now())
 }
 
+// Invisible visit counter for both sites (main + AP). Never displayed.
+// Stores only page path, referring source, and device type — no IPs/cookies.
+model PageView {
+  id        String   @id @default(cuid())
+  site      String   // main | ap
+  path      String
+  source    String   // WhatsApp | Facebook | Google | Direct / link | Internal | other host
+  device    String   // Mobile | Desktop | Tablet | Bot | Unknown
+  createdAt DateTime @default(now())
+
+  @@index([site, createdAt])
+}
+
 // Free-response timed test submissions (e.g. teacher-assigned worksheet tests).
 // One row per student per test. Drafts are auto-saved during the test; once
 // final=true the row is locked and no further edits are accepted.
