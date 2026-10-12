@@ -9,7 +9,7 @@ const ALLOWED_ORIGINS = new Set([
   "https://www.promindstutoring.com",
 ]);
 
-function corsHeaders(req: NextRequest) {
+function corsHeaders(req: NextRequest): Record<string, string> {
   const origin = req.headers.get("origin") ?? "";
   if (!ALLOWED_ORIGINS.has(origin)) return {};
   return {
