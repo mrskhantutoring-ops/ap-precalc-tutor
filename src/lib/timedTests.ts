@@ -119,6 +119,14 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
     minutes: 30,
     questions: imageSet("alg1-sequences", "q", 16, "Question"),
   },
+  "alg1-seq-scatter": {
+    id: "alg1-seq-scatter",
+    title: "Algebra 1 — Arithmetic Sequences & Scatter Plots",
+    description:
+      "18 questions in two parts: arithmetic sequences (common differences, recursive and explicit formulas, converting between them, and a savings application) and scatter plots (association, correlation, trend lines, and predictions). Show your work on the writing pad under each question — for trend-line questions, sketch your line on the pad — and type your final answers in the box. You have 40 minutes. Your work auto-saves and is submitted automatically when time runs out — after that the test is locked and cannot be reopened.",
+    minutes: 40,
+    questions: imageSet("alg1-seq-scatter", "q", 18, "Question"),
+  },
   "growth-decay-drill-1": {
     id: "growth-decay-drill-1",
     title: "Growth / Decay Drill — Set 1",
