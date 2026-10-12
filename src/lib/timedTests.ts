@@ -111,6 +111,14 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
     minutes: 60,
     questions: imageSet("exp-challenge", "q", 20, "Question"),
   },
+  "alg1-sequences": {
+    id: "alg1-sequences",
+    title: "Algebra 1 — Arithmetic & Geometric Sequences (Day 1)",
+    description:
+      "16 questions on arithmetic and geometric sequences: finding terms from a rule, recursive and explicit formulas, identifying sequence types, error analysis, and applications. Show your work on the writing pad under each question and type your final answers in the box. You have 30 minutes. Your work auto-saves and is submitted automatically when time runs out — after that the test is locked and cannot be reopened.",
+    minutes: 30,
+    questions: imageSet("alg1-sequences", "q", 16, "Question"),
+  },
   "growth-decay-drill-1": {
     id: "growth-decay-drill-1",
     title: "Growth / Decay Drill — Set 1",
