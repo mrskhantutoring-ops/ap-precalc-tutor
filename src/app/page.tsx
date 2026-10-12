@@ -178,11 +178,11 @@ export default function Home() {
       <section className="rounded-2xl bg-[#073c59] px-6 py-14 text-center text-white">
         <h2 className="text-3xl font-extrabold">Ready when you are.</h2>
         <p className="mx-auto mt-2 max-w-xl text-slate-300">
-          Enroll now to unlock AP-style practice, or book a free intro call and get a plan built around the May exam.
+          Create your account to get started, or book a free intro call and get a plan built around the May exam.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           <Link href="/signup" className="btn-secondary !border-white/20">
-            Enroll now
+            Create your account
           </Link>
           <Link href="/contact" className="rounded-full bg-white px-6 py-3 font-semibold text-black hover:bg-slate-100">
             Book free intro call
