@@ -103,6 +103,14 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
     minutes: 40,
     questions: imageSet("unit2-test-1", "q", 20, "Question"),
   },
+  "exp-challenge": {
+    id: "exp-challenge",
+    title: "Exponential Functions — Challenge Worksheet",
+    description:
+      "20 free-response questions on exponential functions and equations (Unit 2): common-base rewrites, exponential equations, tables, writing equations, and one application problem. Show ALL your work on the writing pad under each question and type your final answer in the box. Give exact answers unless a decimal is requested. You have 60 minutes. Your work auto-saves and is submitted automatically when time runs out — after that the test is locked and cannot be reopened.",
+    minutes: 60,
+    questions: imageSet("exp-challenge", "q", 20, "Question"),
+  },
   "growth-decay-drill-1": {
     id: "growth-decay-drill-1",
     title: "Growth / Decay Drill — Set 1",
