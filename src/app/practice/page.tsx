@@ -7,6 +7,8 @@ import { timedTestList } from "@/lib/timedTests";
 import PaidGate from "@/components/PaidGate";
 
 const timedTests = timedTestList();
+const frTests = timedTests.filter((t) => t.subject !== "algebra");
+const algebraTests = timedTests.filter((t) => t.subject === "algebra");
 
 type SectionProgress = {
   subject: string;
@@ -18,11 +20,12 @@ type SectionProgress = {
   accuracy: number | null;
 };
 
-type TabId = "practice" | "free-response" | "assessments" | "study";
+type TabId = "practice" | "free-response" | "algebra" | "assessments" | "study";
 
 const TABS: { id: TabId; label: string }[] = [
   { id: "practice", label: "Practice" },
   { id: "free-response", label: "Free Response" },
+  { id: "algebra", label: "Algebra 1" },
   { id: "assessments", label: "Assessments" },
   { id: "study", label: "Study" },
 ];
@@ -40,10 +43,32 @@ export default function PracticeHub() {
   );
 }
 
+function TimedTestCard({ t }: { t: (typeof timedTests)[number] }) {
+  return (
+    <div className="card flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <p className="font-bold text-black">{t.title}</p>
+        <p className="mt-1 text-sm text-slate-600">
+          ⏱ {t.minutes} minutes · 📝 {t.questions.length} free-response questions
+        </p>
+      </div>
+      <Link href={`/practice/timed/${t.id}`} className="btn-primary shrink-0">
+        Open test <span className="btn-arrow" aria-hidden>↗</span>
+      </Link>
+    </div>
+  );
+}
+
 function PracticeHubInner() {
   const [tab, setTab] = useState<TabId>("practice");
   const [unitId, setUnitId] = useState("unit-1");
   const [progress, setProgress] = useState<SectionProgress[] | null>(null);
+
+  // Deep link: /practice#algebra opens the Algebra 1 tab directly (the main
+  // site's Algebra page links here for signed-in students).
+  useEffect(() => {
+    if (window.location.hash === "#algebra") setTab("algebra");
+  }, []);
 
   useEffect(() => {
     fetch("/api/progress")
@@ -172,21 +197,27 @@ function PracticeHubInner() {
               and the test locks when time runs out.
             </p>
           </div>
-          {timedTests.length === 0 && (
+          {frTests.length === 0 && (
             <p className="text-sm text-slate-500">No free-response tests yet — check back soon.</p>
           )}
-          {timedTests.map((t) => (
-            <div key={t.id} className="card flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="font-bold text-black">{t.title}</p>
-                <p className="mt-1 text-sm text-slate-600">
-                  ⏱ {t.minutes} minutes · 📝 {t.questions.length} free-response questions
-                </p>
-              </div>
-              <Link href={`/practice/timed/${t.id}`} className="btn-primary shrink-0">
-                Open test <span className="btn-arrow" aria-hidden>↗</span>
-              </Link>
-            </div>
+          {frTests.map((t) => (
+            <TimedTestCard key={t.id} t={t} />
+          ))}
+        </div>
+      )}
+
+      {tab === "algebra" && (
+        <div className="space-y-4">
+          <div>
+            <h2 className="text-xl font-extrabold tracking-tight">Algebra 1 worksheets</h2>
+            <p className="mt-1 max-w-2xl text-sm text-slate-600">
+              Timed worksheet practice for Algebra 1 students. Type your answers, show your work
+              on the writing pad, and submit before the clock runs out — your work auto-saves as
+              you go.
+            </p>
+          </div>
+          {algebraTests.map((t) => (
+            <TimedTestCard key={t.id} t={t} />
           ))}
         </div>
       )}
