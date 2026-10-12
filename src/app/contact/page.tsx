@@ -6,7 +6,6 @@ import { site } from "@/lib/site";
 export default function Contact() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [test, setTest] = useState("AP Precalculus");
   const [message, setMessage] = useState("");
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -28,7 +27,7 @@ export default function Contact() {
     const res = await fetch("/api/inquiries", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, test, message }),
+      body: JSON.stringify({ name, email, message }),
     });
     const data = await res.json();
     if (!res.ok) {
@@ -69,14 +68,6 @@ export default function Contact() {
             <label className="label">Email</label>
             <input className="input" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
-        </div>
-        <div>
-          <label className="label">What do you need help with?</label>
-          <select className="input" value={test} onChange={(e) => setTest(e.target.value)}>
-            {["AP Precalculus", "Unit 1: Polynomial & Rational Functions", "Unit 2: Exponential & Logarithmic Functions", "Enrollment / access", "Something else"].map((t) => (
-              <option key={t}>{t}</option>
-            ))}
-          </select>
         </div>
         <div>
           <label className="label">Anything we should know? (current units covered, target AP score, exam date…)</label>
