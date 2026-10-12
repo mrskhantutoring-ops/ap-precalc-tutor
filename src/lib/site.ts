@@ -38,7 +38,7 @@ export const UNITS = [
     short: "Unit 1",
     blurb: "College Board weighting 30–40% · polynomial and rational functions",
     icon: "📈",
-    count: 45,
+    count: 72,
     tint: { bg: "#FEFCE8", border: "#FEF08A", chipBg: "#FEF08A", chipText: "#A16207" },
   },
   {
@@ -47,7 +47,7 @@ export const UNITS = [
     short: "Unit 2",
     blurb: "College Board weighting 25–40% · exponential and logarithmic functions",
     icon: "📊",
-    count: 62,
+    count: 102,
     tint: { bg: "#F0F9FF", border: "#BAE6FD", chipBg: "#BAE6FD", chipText: "#0369A1" },
   },
   {

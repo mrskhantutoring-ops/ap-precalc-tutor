@@ -12,7 +12,7 @@ const faqs = [
   },
   {
     q: "How do the practice drills work?",
-    a: "Pick a unit and start a drill: 5 questions, one click per answer, instant feedback with a step-by-step explanation after every question. Your score and every attempt are tracked on your dashboard. Timed sets mirror the AP multiple-choice section when you want exam-day pressure.",
+    a: "Pick a unit and start a quick drill or a full section set: one click per answer, instant feedback with a step-by-step explanation after every question. Your score and every attempt are tracked on your dashboard. Timed sets mirror the AP multiple-choice section when you want exam-day pressure.",
   },
   {
     q: "How do I get access?",
@@ -61,7 +61,7 @@ export default function Home() {
       <section id="units" className="scroll-mt-24 space-y-6">
         <h2 className="text-center text-4xl font-extrabold tracking-tight">Choose a unit</h2>
         <p className="mx-auto max-w-2xl text-center text-slate-600">
-          Five-question drills with instant feedback. Pick a unit below — no setup, just start.
+          Quick drills or full section practice, with instant feedback after every question. Pick a unit below — no setup, just start.
         </p>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {UNITS.map((s) => (
