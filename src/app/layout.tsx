@@ -24,9 +24,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           strategy="beforeInteractive"
         />
         <Navbar />
-        <main className="mx-auto max-w-6xl px-4 pb-20 pt-8">{children}</main>
+        <main className="mx-auto w-[min(1120px,calc(100%-40px))] pb-20 pt-8">{children}</main>
         <footer className="bg-[#073c59] text-slate-300">
-          <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 text-sm sm:grid-cols-4">
+          <div className="mx-auto grid w-[min(1120px,calc(100%-40px))] gap-8 py-12 text-sm sm:grid-cols-4">
             <div>
               <p className="text-lg font-extrabold text-white">{site.name}</p>
               <p className="mt-2 text-slate-400">
@@ -63,7 +63,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
           </div>
           <div className="bg-[#0a4a6e]">
-            <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-4 py-4 text-sm text-white sm:flex-row">
+            <div className="mx-auto flex w-[min(1120px,calc(100%-40px))] flex-col items-center justify-between gap-2 py-4 text-sm text-white sm:flex-row">
               <p>© {new Date().getFullYear()} {site.name}</p>
               <p className="flex gap-4">
                 <a href="/contact" className="hover:underline">Contact</a>
