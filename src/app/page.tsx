@@ -29,7 +29,7 @@ export default function Home() {
     <div className="space-y-16">
       {/* Hero */}
       <section className="hero-pattern relative left-1/2 -mt-8 w-screen -translate-x-1/2 px-4 py-16 text-center sm:py-20">
-        <div className="mx-auto w-[min(1120px,calc(100%-40px))]">
+        <div className="mx-auto w-[min(1180px,calc(100%-40px))]">
         <span className="inline-block rounded-full bg-white px-4 py-1.5 text-sm font-semibold text-[#073c59]">
           For enrolled Pro Minds students
         </span>

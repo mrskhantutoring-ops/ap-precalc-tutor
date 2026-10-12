@@ -25,7 +25,7 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-[#bdd3dc] bg-white/95 backdrop-blur">
-      <div className="mx-auto flex w-[min(1120px,calc(100%-40px))] items-center justify-between py-2.5">
+      <div className="mx-auto flex w-[min(1180px,calc(100%-40px))] items-center justify-between py-2.5">
         <a href="https://promindstutoring.com/" className="flex items-center gap-2.5 text-[19px] font-extrabold tracking-tight text-[#0a3d62]" aria-label="Pro Minds home">
           <img src="/pie-logo.png" alt="" width={28} height={28} className="rounded-full" />
           <span>Pro Minds</span>
