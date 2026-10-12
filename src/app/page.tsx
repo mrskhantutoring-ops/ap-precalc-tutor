@@ -150,7 +150,7 @@ export default function Home() {
                   <li key={f}>✓ {f}</li>
                 ))}
               </ul>
-              <Link href="/contact" className="btn-primary mt-6 w-full">
+              <Link href={`/contact?pkg=${encodeURIComponent(p.name)}`} className="btn-primary mt-6 w-full">
                 Book now
               </Link>
             </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { site } from "@/lib/site";
 
 export default function Contact() {
@@ -11,6 +11,15 @@ export default function Contact() {
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  // Arriving from a pricing card ("Book now") carries ?pkg=<package name>:
+  // prefill the message so the inquiry names the package they clicked.
+  useEffect(() => {
+    const pkg = new URLSearchParams(window.location.search).get("pkg");
+    if (pkg && site.pricing.some((p) => p.name === pkg)) {
+      setMessage(`I'm interested in the ${pkg}.\n\n`);
+    }
+  }, []);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
