@@ -35,7 +35,7 @@ export type TimedTest = {
   mcq?: McqItem[];
 };
 
-import { growthDecayDrill1, growthDecayDrill2, growthDecayDrill3 } from "./drillMcqData";
+import { growthDecayDrill1, growthDecayDrill2, growthDecayDrill3, growthDecayDrill4 } from "./drillMcqData";
 
 function imageSet(testId: string, dir: string, count: number, label: string): TimedTestQuestion[] {
   return Array.from({ length: count }, (_, i) => ({
@@ -161,6 +161,16 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
     softTimer: true,
     questions: imageSet("growth-decay-drill-3", "q", 22, "Question"),
     mcq: growthDecayDrill3,
+  },
+  "growth-decay-drill-4": {
+    id: "growth-decay-drill-4",
+    title: "Growth / Decay Drill — Set 4 (Negative a)",
+    description:
+      "Speed drill, fourth set: 15 multiple-choice questions built entirely on the negative-a cases — the ones that flip every shortcut. With a < 0 the type is NEITHER growth nor decay, the direction reverses, the range can run DOWNWARD from the asymptote, and the dive to −∞ can hide at either end. Plus exponent clean-ups with a negative a, reading direction from f(0) and f(1), and one context question. Click the correct answer — you get instant feedback on every question, plus a hint if you want one and an explanation once you answer. No writing needed. Target time is 10 minutes, but the timer will NOT lock or auto-submit — keep going if you need to and press Submit when you're done. Your actual time is recorded.",
+    minutes: 10,
+    softTimer: true,
+    questions: imageSet("growth-decay-drill-4", "q", 15, "Question"),
+    mcq: growthDecayDrill4,
   },
 };
 
