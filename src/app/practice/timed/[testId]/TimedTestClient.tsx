@@ -555,16 +555,21 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
               className="mx-auto mt-4 w-full max-w-3xl rounded-lg border border-slate-100"
               loading="lazy"
             />
-            <div className="mx-auto mt-4 max-w-3xl">
-              <label className="label">Your answer — show your work</label>
-              <textarea
-                className="input min-h-28"
-                value={answers[q.key] ?? ""}
-                onChange={(e) => setAnswer(q.key, e.target.value)}
-                placeholder="Type your answer and work here…"
-              />
-            </div>
+            {!test.padOnly && (
+              <div className="mx-auto mt-4 max-w-3xl">
+                <label className="label">Your answer — show your work</label>
+                <textarea
+                  className="input min-h-28"
+                  value={answers[q.key] ?? ""}
+                  onChange={(e) => setAnswer(q.key, e.target.value)}
+                  placeholder="Type your answer and work here…"
+                />
+              </div>
+            )}
             <div className="mx-auto mt-5 max-w-3xl border-t border-slate-100 pt-4">
+              {test.padOnly && (
+                <p className="label mb-2">✍️ Work space — write your work and your answer on the pad</p>
+              )}
               {Array.from({ length: pagesFor(q.key) }, (_, i) => {
                 const pk = i === 0 ? q.key : `${q.key}_pg${i + 1}`;
                 return (

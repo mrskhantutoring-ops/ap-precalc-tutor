@@ -27,6 +27,10 @@ export type TimedTest = {
   // auto-submits or locks; the student keeps working and submits manually, and
   // the actual time used is recorded.
   softTimer?: boolean;
+  // Pad-only mode: no typed answer box — the student writes all work and
+  // answers on the handwriting pad under each question (e.g. Wacom users).
+  // Drawings alone already count a question as answered.
+  padOnly?: boolean;
   questions: TimedTestQuestion[];
   // Click-MCQ mode: when present (parallel to questions), the player renders
   // tappable choices with instant right/wrong feedback, a hint, and an
@@ -105,6 +109,15 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
       "20 multiple-choice questions on exponential functions (Topics 2.3–2.4). Type the letter of your answer for each question and show your work on the writing pad. Quick rules: a = starting multiplier (negative flips the graph), b = growth factor (b > 1 grows, 0 < b < 1 decays), k = the floor/ceiling y = k that the curve never touches. You have 40 minutes. Your work auto-saves as you type and is submitted automatically when time runs out — after that the test is locked and cannot be reopened.",
     minutes: 40,
     questions: imageSet("unit2-test-1", "q", 20, "Question"),
+  },
+  "unit2-prep-exam": {
+    id: "unit2-prep-exam",
+    title: "Unit 2 Prep Exam",
+    description:
+      "20 free-response questions on Unit 2 (exponential functions, sequences, and modeling) in three parts: Part 1 Speed & Fluency, Part 2 Algebra Under Pressure, Part 3 AP-Style Reasoning & Modeling. This exam is handwritten — there is no typing box. Write ALL your work and your answers on the writing pad under each question. Rules: no calculator; give exact answers (no decimals) unless asked; and write the setup line for every problem — setup is where the AP points live. You have 40 minutes. Your work auto-saves as you write and is submitted automatically when time runs out — after that the test is locked and cannot be reopened.",
+    minutes: 40,
+    padOnly: true,
+    questions: imageSet("unit2-prep-exam", "q", 20, "Question"),
   },
   "exp-challenge": {
     id: "exp-challenge",
