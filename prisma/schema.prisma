@@ -111,3 +111,13 @@ model TimedSubmission {
   @@index([userId])
   @@index([testId])
 }
+
+// Failed sign-in attempts, used to throttle password/token guessing.
+// key is "login:<email>", "login-ip:<ip>", or "admin:<ip>".
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  key       String
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
+}

@@ -25,6 +25,7 @@ export async function createSession(userId: string) {
   cookies().set(SESSION_COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
     path: "/",
     expires: expiresAt,
   });
@@ -46,6 +47,7 @@ export function setAdminCookie(token: string) {
   cookies().set(ADMIN_COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
     path: "/",
     maxAge: 7 * 24 * 60 * 60,
   });
