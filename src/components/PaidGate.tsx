@@ -33,6 +33,11 @@ export default function PaidGate({ children }: { children: React.ReactNode }) {
           <Link href="/login" className="btn-primary flex-1">Log in</Link>
           <Link href="/signup" className="btn-secondary flex-1">Sign up</Link>
         </div>
+        <p className="mt-4 text-sm text-slate-600">
+          Not a student yet?{" "}
+          <Link href="/contact" className="font-semibold text-brand-600 underline">Contact Pro Minds</Link>{" "}
+          to ask about enrolling — you don&apos;t need an account first.
+        </p>
       </div>
     );
 
