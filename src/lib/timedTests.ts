@@ -31,6 +31,10 @@ export type TimedTest = {
   // answers on the handwriting pad under each question (e.g. Wacom users).
   // Drawings alone already count a question as answered.
   padOnly?: boolean;
+  // Scheduled release: ISO timestamp. Before this moment the test is hidden
+  // from the practice hub list, its page shows an "opens at" notice to
+  // students, and the API refuses starts/saves. Admin preview ignores it.
+  availableAt?: string;
   questions: TimedTestQuestion[];
   // Click-MCQ mode: when present (parallel to questions), the player renders
   // tappable choices with instant right/wrong feedback, a hint, and an
@@ -119,6 +123,16 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
     padOnly: true,
     questions: imageSet("unit2-prep-exam", "q", 20, "Question"),
   },
+  "unit2-transformations": {
+    id: "unit2-transformations",
+    title: "Unit 2 — Transformations Practice",
+    description:
+      "6 free-response questions on transformations of exponential functions — horizontal and vertical shifts, reflections, and compressions. Show your work on the writing pad under each question and type your final answers in the box. Give exact answers. Two tools: factor the number out of x before reading a shift, and set the inside of the exponent equal to 0 and solve — that x is the horizontal shift. You have 15 minutes. Your work auto-saves as you go and is submitted automatically when time runs out — after that the test is locked and cannot be reopened.",
+    minutes: 15,
+    // Faryal's release: hidden from students until Sun 2026-10-18 2:00 PM CDT.
+    availableAt: "2026-10-18T19:00:00.000Z",
+    questions: imageSet("unit2-transformations", "q", 6, "Question"),
+  },
   "exp-challenge": {
     id: "exp-challenge",
     title: "Exponential Functions — Challenge Worksheet",
@@ -192,5 +206,12 @@ export function timedTestById(id: string): TimedTest | null {
 }
 
 export function timedTestList(): TimedTest[] {
-  return Object.values(TIMED_TESTS);
+  const now = Date.now();
+  return Object.values(TIMED_TESTS).filter(
+    (t) => !t.availableAt || new Date(t.availableAt).getTime() <= now
+  );
+}
+
+export function isTestReleased(test: TimedTest): boolean {
+  return !test.availableAt || new Date(test.availableAt).getTime() <= Date.now();
 }

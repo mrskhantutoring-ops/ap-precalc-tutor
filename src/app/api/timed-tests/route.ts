@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
-import { timedTestById } from "@/lib/timedTests";
+import { timedTestById, isTestReleased } from "@/lib/timedTests";
 
 export const dynamic = "force-dynamic";
 
@@ -92,6 +92,7 @@ export async function GET(req: NextRequest) {
   const testId = req.nextUrl.searchParams.get("testId") ?? "";
   const test = timedTestById(testId);
   if (!test) return NextResponse.json({ error: "Unknown test." }, { status: 404 });
+  if (!isTestReleased(test)) return NextResponse.json({ error: "This test isn't open yet." }, { status: 403 });
 
   const row = await db.timedSubmission.findUnique({
     where: { testId_userId: { testId, userId: user.id } },
@@ -125,6 +126,7 @@ export async function POST(req: NextRequest) {
   const testId = typeof body?.testId === "string" ? body.testId : "";
   const test = timedTestById(testId);
   if (!test) return NextResponse.json({ error: "Unknown test." }, { status: 404 });
+  if (!isTestReleased(test)) return NextResponse.json({ error: "This test isn't open yet." }, { status: 403 });
 
   const answers = sanitizeAnswers(body?.answers, test.questions.map((q) => q.key));
   const drawingPatch = sanitizeDrawings(body?.drawings, test.questions.map((q) => q.key));
