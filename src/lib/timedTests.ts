@@ -127,11 +127,11 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
     id: "unit2-transformations",
     title: "Unit 2 — Transformations Practice",
     description:
-      "6 free-response questions on transformations of exponential functions — horizontal and vertical shifts, reflections, and compressions. Show your work on the writing pad under each question and type your final answers in the box. Give exact answers. Two tools: factor the number out of x before reading a shift, and set the inside of the exponent equal to 0 and solve — that x is the horizontal shift. You have 15 minutes. Your work auto-saves as you go and is submitted automatically when time runs out — after that the test is locked and cannot be reopened.",
+      "12 free-response questions on transformations of exponential functions — horizontal and vertical shifts, reflections, and compressions. Show your work on the writing pad under each question and type your final answers in the box. Give exact answers. Two tools: factor the number out of x before reading a shift, and set the inside of the exponent equal to 0 and solve — that x is the horizontal shift. You have 15 minutes. Your work auto-saves as you go and is submitted automatically when time runs out — after that the test is locked and cannot be reopened.",
     minutes: 15,
     // Faryal's release: hidden from students until Sun 2026-10-18 2:00 PM CDT.
     availableAt: "2026-10-18T19:00:00.000Z",
-    questions: imageSet("unit2-transformations", "q", 6, "Question"),
+    questions: imageSet("unit2-transformations", "q", 12, "Question"),
   },
   "exp-challenge": {
     id: "exp-challenge",
