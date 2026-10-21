@@ -133,6 +133,14 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
     availableAt: "2026-10-18T19:00:00.000Z",
     questions: imageSet("unit2-transformations", "q", 12, "Question"),
   },
+  "unit2-graphing-samebase": {
+    id: "unit2-graphing-samebase",
+    title: "Unit 2 — Graphing & Same-Base Drill",
+    description:
+      "10 questions in three parts, built for the Exponential Function Quiz. Part A (Q1–4): sketch the graph of each exponential function on the writing pad — mark the horizontal asymptote and both intercepts — and type the characteristics in the box: HA, domain, range, increasing or decreasing, concavity, and both end-behavior limits. Part B (Q5–8): solve each equation by rewriting with the same base — show the rewrite line on the pad and type the solution in the box. Part C (Q9–10): modeling — write the equation from a table, and work a cooling model. Give exact answers. You have 25 minutes. Your work auto-saves as you go and is submitted automatically when time runs out — after that the test is locked and cannot be reopened.",
+    minutes: 25,
+    questions: imageSet("unit2-graphing-samebase", "q", 10, "Question"),
+  },
   "exp-challenge": {
     id: "exp-challenge",
     title: "Exponential Functions — Challenge Worksheet",
