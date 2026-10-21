@@ -403,7 +403,15 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
         ) : (
             <div key={q.key} className="card !p-4">
               <p className="text-sm font-bold">{q.label}</p>
-              <p className="mt-1 whitespace-pre-wrap text-sm text-slate-600">
+              {q.image && (
+                <img
+                  src={q.image}
+                  alt={`${q.label} question`}
+                  className="mt-2 w-full rounded-lg border border-slate-200"
+                  loading="lazy"
+                />
+              )}
+              <p className="mt-2 whitespace-pre-wrap text-sm text-slate-600">
                 {answers[q.key]?.trim() ? answers[q.key] : <span className="italic text-slate-400">(no answer)</span>}
               </p>
               {drawings[q.key] && (
