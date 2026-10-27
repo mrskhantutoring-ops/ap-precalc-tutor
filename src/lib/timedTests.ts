@@ -194,6 +194,25 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
       { key: "q36", label: "Ex 4.6 — Use the change-of-base formula to evaluate", image: "/timed/unit2-log-manipulation/q36.png" },
     ],
   },
+  "unit2-composition-functions": {
+    id: "unit2-composition-functions",
+    title: "Unit 2 — Composition of Functions Quiz",
+    description:
+      "10 free-response questions on composition of functions (Topic 2.7). Evaluate the inside function first, then use that output as the input to the outside function — order matters. Show your work on the writing pad under each question and type your final answer in the box. You have 15 minutes. Your work auto-saves as you go and is submitted automatically when time runs out — after that the test is locked and cannot be reopened.",
+    minutes: 15,
+    questions: [
+      { key: "q1", label: "Question 1 — Find f(g(2))", image: "/timed/unit2-composition-functions/q1.png" },
+      { key: "q2", label: "Question 2 — Find g(f(2))", image: "/timed/unit2-composition-functions/q2.png" },
+      { key: "q3", label: "Question 3 — Find f(g(x)), simplified", image: "/timed/unit2-composition-functions/q3.png" },
+      { key: "q4", label: "Question 4 — Find (g ∘ f)(x), simplified", image: "/timed/unit2-composition-functions/q4.png" },
+      { key: "q5", label: "Question 5 — Find (h ∘ k)(2)", image: "/timed/unit2-composition-functions/q5.png" },
+      { key: "q6", label: "Question 6 — Find (k ∘ h)(2)", image: "/timed/unit2-composition-functions/q6.png" },
+      { key: "q7", label: "Question 7 — Find (p ∘ q)(1) from the table", image: "/timed/unit2-composition-functions/q7.png" },
+      { key: "q8", label: "Question 8 — Find (q ∘ p)(0) from the table", image: "/timed/unit2-composition-functions/q8.png" },
+      { key: "q9", label: "Question 9 — Write an equation for m(x)", image: "/timed/unit2-composition-functions/q9.png" },
+      { key: "q10", label: "Question 10 — Find (f ∘ m)(3)", image: "/timed/unit2-composition-functions/q10.png" },
+    ],
+  },
   "growth-decay-drill-1": {
     id: "growth-decay-drill-1",
     title: "Growth / Decay Drill — Set 1",
