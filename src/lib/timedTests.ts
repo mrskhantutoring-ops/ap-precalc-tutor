@@ -240,6 +240,22 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
       { key: "q18", label: "Question 18 — Solve log₂(log₂ x) = 3", image: "/timed/unit2-log-equations/q18.png" },
     ],
   },
+  "unit2-log-functions-part1": {
+    id: "unit2-log-functions-part1",
+    title: "Unit 2 — Logarithmic Functions, Part 1 (Written)",
+    description:
+      "25 free-response questions on logarithmic functions (Topics 2.10 and 2.11): log tables and patterns, end behavior, domain and range, transformations, inverses, equations, and applications. Show your work on the writing pad under each question and type your final answer in the box — sketch graphs on the pad for the Section D questions. You have 60 minutes. Your work auto-saves as you go and is submitted automatically when time runs out — after that the test is locked and cannot be reopened.",
+    minutes: 60,
+    questions: imageSet("unit2-log-functions-part1", "q", 25, "Question"),
+  },
+  "unit2-log-functions-part2-sprint": {
+    id: "unit2-log-functions-part2-sprint",
+    title: "Unit 2 — Logarithmic Functions, Part 2 — Sprint (Multiple-Select)",
+    description:
+      "20 multiple-select questions on logarithmic functions (Topics 2.10 and 2.11) — choose ALL correct options for each question. Type ALL correct letters in the box (for example: A, B, D). You have 20 minutes. Your work auto-saves as you go and is submitted automatically when time runs out — after that the test is locked and cannot be reopened.",
+    minutes: 20,
+    questions: imageSet("unit2-log-functions-part2-sprint", "q", 20, "Question"),
+  },
   "growth-decay-drill-1": {
     id: "growth-decay-drill-1",
     title: "Growth / Decay Drill — Set 1",
