@@ -256,6 +256,14 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
     minutes: 20,
     questions: imageSet("unit2-log-functions-part2-sprint", "q", 20, "Question"),
   },
+  "log-warmup-oct30": {
+    id: "log-warmup-oct30",
+    title: "Log Warm Up — Oct 30",
+    description:
+      "6 free-response warm-up questions on logarithms: convert each logarithmic equation to exponential form and find the missing value, then three applications — sound intensity in decibels, earthquake magnitude, and pH. Show your work on the writing pad under each question and type your final answer in the box. You have 7 minutes. Your work auto-saves as you go and is submitted automatically when time runs out — after that the test is locked and cannot be reopened.",
+    minutes: 7,
+    questions: imageSet("log-warmup-oct30", "q", 6, "Question"),
+  },
   "growth-decay-drill-1": {
     id: "growth-decay-drill-1",
     title: "Growth / Decay Drill — Set 1",
