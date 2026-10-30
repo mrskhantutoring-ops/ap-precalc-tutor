@@ -260,9 +260,9 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
     id: "log-warmup-oct30",
     title: "Log Warm Up — Oct 30",
     description:
-      "6 free-response warm-up questions on logarithms: convert each logarithmic equation to exponential form and find the missing value, then three applications — sound intensity in decibels, earthquake magnitude, and pH. Show your work on the writing pad under each question and type your final answer in the box. You have 7 minutes. Your work auto-saves as you go and is submitted automatically when time runs out — after that the test is locked and cannot be reopened.",
-    minutes: 7,
-    questions: imageSet("log-warmup-oct30", "q", 6, "Question"),
+      "26 free-response warm-up questions on logarithms: convert each logarithmic equation to exponential form and find the missing value, then three applications — sound intensity in decibels, earthquake magnitude, and pH — followed by logarithm-to-exponential form (Q7–12), exponential-to-logarithmic form (Q13–18), and logarithm evaluation (Q19–26). Show your work on the writing pad under each question and type your final answer in the box. You have 20 minutes. Your work auto-saves as you go and is submitted automatically when time runs out — after that the test is locked and cannot be reopened.",
+    minutes: 20,
+    questions: imageSet("log-warmup-oct30", "q", 26, "Question"),
   },
   "growth-decay-drill-1": {
     id: "growth-decay-drill-1",
