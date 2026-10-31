@@ -85,6 +85,12 @@ model PageView {
   path      String
   source    String   // WhatsApp | Facebook | Google | Direct / link | Internal | other host
   device    String   // Mobile | Desktop | Tablet | Bot | Unknown
+  // Approximate location only (city / state / country), from Vercel's
+  // geolocation headers. The visitor's IP is NEVER read, stored, or logged
+  // here — there is no IP column, by design. Null when headers are absent.
+  city      String?
+  region    String?
+  country   String?
   createdAt DateTime @default(now())
 
   @@index([site, createdAt])
