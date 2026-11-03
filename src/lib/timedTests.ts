@@ -264,6 +264,25 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
     minutes: 40,
     questions: imageSet("log-warmup-oct30", "q", 32, "Question"),
   },
+  "log-inequalities-nov3": {
+    id: "log-inequalities-nov3",
+    title: "Unit 2 — Solving Logarithmic Inequalities — Nov 3, 2026",
+    description:
+      "10 free-response questions on solving logarithmic inequalities, in three parts — Part A: comparing two logarithms (Q1–3), Part B: logarithms greater than or less than zero (Q4–6), Part C: domain restrictions and intersections (Q7–10). Write both domain conditions first, then drop the log (base greater than 1, direction kept) and intersect with the domain. Give every answer in interval notation. Show your work on the writing pad under each question and type your final answer in the box. You have 30 minutes. Your work auto-saves as you go and is submitted automatically when time runs out — after that the test is locked and cannot be reopened.",
+    minutes: 30,
+    questions: [
+      { key: "q1", label: "Part A · Question 1 — log(x + 2) > log(3x − 4). Find all values of x, in interval notation.", image: "/timed/log-inequalities-nov3/q1.png" },
+      { key: "q2", label: "Part A · Question 2 — ln(x² + 4) > ln(5x − 6). Find all values of x. Remember to check the domain.", image: "/timed/log-inequalities-nov3/q2.png" },
+      { key: "q3", label: "Part A · Question 3 — log(x² − 5x + 6) < log(x + 2). Find all values of x, in interval notation.", image: "/timed/log-inequalities-nov3/q3.png" },
+      { key: "q4", label: "Part B · Question 4 — f(x) = log(x² − 7x + 10). Find all values of x for which f(x) > 0.", image: "/timed/log-inequalities-nov3/q4.png" },
+      { key: "q5", label: "Part B · Question 5 — g(x) = log(x² − 2x − 8) − log(x + 2). Find all values of x for which g(x) > 0.", image: "/timed/log-inequalities-nov3/q5.png" },
+      { key: "q6", label: "Part B · Question 6 — h(x) = ln(x² − 4) − ln(x − 1). Find all values of x for which h(x) < 0.", image: "/timed/log-inequalities-nov3/q6.png" },
+      { key: "q7", label: "Part C · Question 7 — f(x) = ln(x² − 3x − 4) − ln(x + 2). Find all values of x for which f(x) > 0.", image: "/timed/log-inequalities-nov3/q7.png" },
+      { key: "q8", label: "Part C · Question 8 — g(x) = ln(x² + 2x − 8), h(x) = ln(3x + 4). Find all values of x for which g(x) < h(x).", image: "/timed/log-inequalities-nov3/q8.png" },
+      { key: "q9", label: "Part C · Question 9 — p(x) = log(x² + 3x + 1) − log(2x + 5). Find all values of x for which p(x) > 0.", image: "/timed/log-inequalities-nov3/q9.png" },
+      { key: "q10", label: "Part C · Question 10 — f(x) = ln(x² − 5x + 4), g(x) = ln(2x − 2). Find all values of x for which f(x) > g(x).", image: "/timed/log-inequalities-nov3/q10.png" },
+    ],
+  },
   "growth-decay-drill-1": {
     id: "growth-decay-drill-1",
     title: "Growth / Decay Drill — Set 1",
