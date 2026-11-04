@@ -285,7 +285,7 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
   },
   "log-properties-nov3": {
     id: "log-properties-nov3",
-    title: "Unit 2 — Logarithm Properties Practice — Nov 3, 2026",
+    title: "Unit 2 — Logarithm Properties Practice — Nov 5, 2026",
     description:
       "25 free-response questions on logarithm properties, in four parts — Part 1: expanding logarithms (Q1–6), Part 2: condensing logarithms (Q7–12), Part 3: evaluating logarithms without a calculator (Q13–19), Part 4: rewriting logs in terms of given variables (Q20–25). Assume all variables are positive unless a domain is given. Show your work on the writing pad under each question and type your final answer in the box. You have 50 minutes. Your work auto-saves as you go and is submitted automatically when time runs out — after that the test is locked and cannot be reopened.",
     minutes: 50,
