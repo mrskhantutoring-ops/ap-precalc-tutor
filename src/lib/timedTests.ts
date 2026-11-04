@@ -268,8 +268,8 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
     id: "log-inequalities-nov3",
     title: "Unit 2 — Solving Logarithmic Inequalities — Nov 3, 2026",
     description:
-      "10 free-response questions on solving logarithmic inequalities, in three parts — Part A: comparing two logarithms (Q1–3), Part B: logarithms greater than or less than zero (Q4–6), Part C: domain restrictions and intersections (Q7–10). Write both domain conditions first, then drop the log (base greater than 1, direction kept) and intersect with the domain. Give every answer in interval notation. Show your work on the writing pad under each question and type your final answer in the box. You have 30 minutes. Your work auto-saves as you go and is submitted automatically when time runs out — after that the test is locked and cannot be reopened.",
-    minutes: 30,
+      "10 free-response questions on solving logarithmic inequalities, in three parts — Part A: comparing two logarithms (Q1–3), Part B: logarithms greater than or less than zero (Q4–6), Part C: domain restrictions and intersections (Q7–10). Write both domain conditions first, then drop the log (base greater than 1, direction kept) and intersect with the domain. Give every answer in interval notation. Show your work on the writing pad under each question and type your final answer in the box. You have 45 minutes. Your work auto-saves as you go and is submitted automatically when time runs out — after that the test is locked and cannot be reopened.",
+    minutes: 45,
     questions: [
       { key: "q1", label: "Part A · Question 1 — log(x + 2) > log(3x − 4). Find all values of x, in interval notation.", image: "/timed/log-inequalities-nov3/q1.png" },
       { key: "q2", label: "Part A · Question 2 — ln(x² + 4) > ln(5x − 6). Find all values of x. Remember to check the domain.", image: "/timed/log-inequalities-nov3/q2.png" },
