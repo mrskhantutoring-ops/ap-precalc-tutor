@@ -304,6 +304,25 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
     setAnswer(key, LETTERS[idx]);
   }
 
+  // Tap-to-choose letters (multiple-select tests): the toggles read from and
+  // write to the same typed answer string, so typing and tapping stay in
+  // sync and the saved answer is always the plain "A, B, D" text.
+  function lettersIn(answer: string): string[] {
+    const found = new Set<string>();
+    for (const ch of (answer ?? "").toUpperCase()) {
+      if (test.choiceLetters?.includes(ch)) found.add(ch);
+    }
+    return [...found].sort();
+  }
+
+  function toggleLetter(key: string, letter: string) {
+    const current = lettersIn(answersRef.current[key] ?? "");
+    const next = current.includes(letter)
+      ? current.filter((l) => l !== letter)
+      : [...current, letter].sort();
+    setAnswer(key, next.join(", "));
+  }
+
   function setDrawing(key: string, value: string | null) {
     dirtyRef.current = true;
     dirtyDrawingsRef.current.add(key);
@@ -335,7 +354,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
           </div>
           <div className="flex items-center gap-3">
             <span className="text-2xl">📝</span>
-            <p>{test.mcq ? (<><strong className="text-black">{test.questions.length} multiple-choice questions</strong> — click the correct answer for each one. You get instant feedback on every question, plus a hint if you want it and an explanation once you answer. No writing needed.</>) : test.softTimer ? (<><strong className="text-black">{test.questions.length} multiple-choice questions</strong> — type the letter of your answer, and use the writing pad under each question for work. Need more room? You can add up to 2 extra writing pages under any question.</>) : (<><strong className="text-black">{test.questions.length} free-response questions</strong> — type your answer, or write your work by hand on the writing pad under each one. Need more room? You can add up to 2 extra writing pages under any question.</>)}</p>
+            <p>{test.mcq ? (<><strong className="text-black">{test.questions.length} multiple-choice questions</strong> — click the correct answer for each one. You get instant feedback on every question, plus a hint if you want it and an explanation once you answer. No writing needed.</>) : test.choiceLetters ? (<><strong className="text-black">{test.questions.length} multiple-select questions</strong> — tap the letters to choose all the correct ones for each question, or type them in the box. Use the writing pad under each question for work. Need more room? You can add up to 2 extra writing pages under any question.</>) : test.softTimer ? (<><strong className="text-black">{test.questions.length} multiple-choice questions</strong> — type the letter of your answer, and use the writing pad under each question for work. Need more room? You can add up to 2 extra writing pages under any question.</>) : (<><strong className="text-black">{test.questions.length} free-response questions</strong> — type your answer, or write your work by hand on the writing pad under each one. Need more room? You can add up to 2 extra writing pages under any question.</>)}</p>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-2xl">💾</span>
@@ -565,6 +584,31 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
             />
             {!test.padOnly && (
               <div className="mx-auto mt-4 max-w-3xl">
+                {test.choiceLetters && (
+                  <div className="mb-3">
+                    <p className="label">Tap to choose — you can pick more than one</p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {test.choiceLetters.map((letter) => {
+                        const on = lettersIn(answers[q.key] ?? "").includes(letter);
+                        return (
+                          <button
+                            key={letter}
+                            type="button"
+                            aria-pressed={on}
+                            onClick={() => toggleLetter(q.key, letter)}
+                            className={`flex h-12 w-12 items-center justify-center rounded-lg border-2 text-lg font-bold transition ${
+                              on
+                                ? "border-black bg-black text-white"
+                                : "border-slate-300 bg-white text-slate-700 hover:border-slate-500"
+                            }`}
+                          >
+                            {on ? `✓ ${letter}` : letter}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
                 <label className="label">Your answer — show your work</label>
                 <textarea
                   className="input min-h-28"

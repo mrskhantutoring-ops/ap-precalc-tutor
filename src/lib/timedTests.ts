@@ -41,6 +41,14 @@ export type TimedTest = {
   // explanation per question — no typing, no writing pad. The picked letter
   // is still saved through the normal answers pipeline.
   mcq?: McqItem[];
+  // Tap-to-choose letters for a multiple-select free-response test: when
+  // present, the player renders one square toggle per letter under each
+  // question image. Tapping toggles that letter in the typed answer box
+  // ("A, B, D") — the box stays editable, and the toggles simply write
+  // into the same saved answer, so the existing save/score path is
+  // untouched. Radio buttons would be wrong here: a student picks several
+  // letters, not one.
+  choiceLetters?: string[];
 };
 
 import { growthDecayDrill1, growthDecayDrill2, growthDecayDrill3, growthDecayDrill4 } from "./drillMcqData";
@@ -252,8 +260,9 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
     id: "unit2-log-functions-part2-sprint",
     title: "Unit 2 — Logarithmic Functions, Part 2 — Sprint (Multiple-Select)",
     description:
-      "20 multiple-select questions on logarithmic functions (Topics 2.10 and 2.11) — choose ALL correct options for each question. Type ALL correct letters in the box (for example: A, B, D). You have 20 minutes. Your work auto-saves as you go and is submitted automatically when time runs out — after that the test is locked and cannot be reopened.",
+      "20 multiple-select questions on logarithmic functions (Topics 2.10 and 2.11) — choose ALL correct options for each question. Tap the letters to choose them, or type them in the box (for example: A, B, D). You have 20 minutes. Your work auto-saves as you go and is submitted automatically when time runs out — after that the test is locked and cannot be reopened.",
     minutes: 20,
+    choiceLetters: ["A", "B", "C", "D", "E"],
     questions: imageSet("unit2-log-functions-part2-sprint", "q", 20, "Question"),
   },
   "log-warmup-oct30": {
