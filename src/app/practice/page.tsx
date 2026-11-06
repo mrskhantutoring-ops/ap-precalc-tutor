@@ -93,7 +93,7 @@ function TimedTestFolder({
       <summary className="cursor-pointer font-bold text-black">
         📁 {name}{" "}
         <span className="font-normal text-slate-500">
-          — {tests.length} drills · tap to open
+          — {tests.length} tests · tap to open
         </span>
       </summary>
       <div className="mt-3 space-y-3">
