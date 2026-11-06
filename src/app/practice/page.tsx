@@ -9,6 +9,30 @@ import PaidGate from "@/components/PaidGate";
 const timedTests = timedTestList();
 const frTests = timedTests.filter((t) => t.subject !== "algebra");
 
+// Free-response list with folders: tests sharing a group name collapse into
+// one tap-to-open folder, placed where the first test of the group sits.
+type FrItem =
+  | { kind: "test"; t: (typeof frTests)[number] }
+  | { kind: "group"; name: string; tests: (typeof frTests)[number][] };
+
+const frItems: FrItem[] = [];
+{
+  const groupSeen = new Map<string, (typeof frTests)[number][]>();
+  for (const t of frTests) {
+    if (t.group) {
+      let g = groupSeen.get(t.group);
+      if (!g) {
+        g = [];
+        groupSeen.set(t.group, g);
+        frItems.push({ kind: "group", name: t.group, tests: g });
+      }
+      g.push(t);
+    } else {
+      frItems.push({ kind: "test", t });
+    }
+  }
+}
+
 type SectionProgress = {
   subject: string;
   section: string;
@@ -54,6 +78,30 @@ function TimedTestCard({ t }: { t: (typeof timedTests)[number] }) {
         Open test <span className="btn-arrow" aria-hidden>↗</span>
       </Link>
     </div>
+  );
+}
+
+function TimedTestFolder({
+  name,
+  tests,
+}: {
+  name: string;
+  tests: (typeof timedTests)[number][];
+}) {
+  return (
+    <details className="card">
+      <summary className="cursor-pointer font-bold text-black">
+        📁 {name}{" "}
+        <span className="font-normal text-slate-500">
+          — {tests.length} drills · tap to open
+        </span>
+      </summary>
+      <div className="mt-3 space-y-3">
+        {tests.map((t) => (
+          <TimedTestCard key={t.id} t={t} />
+        ))}
+      </div>
+    </details>
   );
 }
 
@@ -189,12 +237,16 @@ function PracticeHubInner() {
               and the test locks when time runs out.
             </p>
           </div>
-          {frTests.length === 0 && (
+          {frItems.length === 0 && (
             <p className="text-sm text-slate-500">No free-response tests yet — check back soon.</p>
           )}
-          {frTests.map((t) => (
-            <TimedTestCard key={t.id} t={t} />
-          ))}
+          {frItems.map((item) =>
+            item.kind === "group" ? (
+              <TimedTestFolder key={item.name} name={item.name} tests={item.tests} />
+            ) : (
+              <TimedTestCard key={item.t.id} t={item.t} />
+            )
+          )}
         </div>
       )}
 

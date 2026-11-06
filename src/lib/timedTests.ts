@@ -23,6 +23,10 @@ export type TimedTest = {
   // Which part of the practice page lists this test. Default "ap"; Algebra
   // worksheets are grouped under their own "Algebra 1 worksheets" heading.
   subject?: "ap" | "algebra";
+  // Folder on the practice hub list: tests sharing a group name collapse
+  // into one tap-to-open folder instead of one card each (e.g. the
+  // Growth / Decay drills live under "Unit 1 Drills").
+  group?: string;
   // Soft timer (speed drills): the countdown is a target only — at 0:00 nothing
   // auto-submits or locks; the student keeps working and submits manually, and
   // the actual time used is recorded.
@@ -64,6 +68,7 @@ function imageSet(testId: string, dir: string, count: number, label: string): Ti
 export const TIMED_TESTS: Record<string, TimedTest> = {
   "unit1-section-1-5": {
     id: "unit1-section-1-5",
+    group: "Unit 1",
     title: "Unit 1 · Section 1.5 — Polynomial Functions & Complex Zeros",
     description:
       "10 free-response questions. You have 30 minutes. Your work auto-saves as you type and is submitted automatically when time runs out — after that the test is locked and cannot be reopened.",
@@ -72,6 +77,7 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
   },
   "unit1b-practice-test": {
     id: "unit1b-practice-test",
+    group: "Unit 1",
     title: "Unit 1B Practice Test — Transformations, Rational Functions & Models",
     description:
       "17 free-response questions in 3 parts (one answer box per part). You have 30 minutes. Your work auto-saves as you type and is submitted automatically when time runs out — after that the test is locked and cannot be reopened.",
@@ -84,6 +90,7 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
   },
   "unit1b-practice-test-2": {
     id: "unit1b-practice-test-2",
+    group: "Unit 1",
     title: "Unit 1B Practice Test #2 — Speed Round",
     description:
       "A fresh set of 17 questions on the same Unit 1B topics, built to train speed. 3 parts (one answer box per part). You have 30 minutes. Your work auto-saves as you type and is submitted automatically when time runs out — after that the test is locked and cannot be reopened.",
@@ -96,6 +103,7 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
   },
   "unit1b-fixit-drill": {
     id: "unit1b-fixit-drill",
+    group: "Unit 1",
     title: "Unit 1B Fix-It Drill — Asymptotes, Even/Odd & Transformations",
     description:
       "12 questions built from the mistakes on your last test: non-vertical asymptotes and end behavior, even and odd functions, and plugging into transformed functions. 3 parts (one answer box per part). You have 20 minutes. Your work auto-saves as you type and is submitted automatically when time runs out — after that the test is locked and cannot be reopened.",
@@ -108,6 +116,7 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
   },
   "quiz-1-retake": {
     id: "quiz-1-retake",
+    group: "Unit 1",
     title: "Unit 1B Quiz Retake",
     description:
       "10 free-response questions. You have 30 minutes. Your work auto-saves as you type and is submitted automatically when time runs out — after that the test is locked and cannot be reopened.",
@@ -352,6 +361,7 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
   },
   "growth-decay-drill-1": {
     id: "growth-decay-drill-1",
+    group: "Unit 1 Drills",
     title: "Growth / Decay Drill — Set 1",
     description:
       "Speed drill: 10 multiple-choice questions on growth, decay, increasing/decreasing, and concavity. Rules: type comes from a and b; concavity comes from the sign of a only; a negative a is NEITHER growth nor decay — and clean up the exponent first (3^(−x) is (1/3)^x). Click the correct answer — you get instant feedback on every question, plus a hint if you want one and an explanation once you answer. No writing needed. Target time is 10 minutes, but the timer will NOT lock or auto-submit — keep going if you need to and press Submit when you're done. Your actual time is recorded.",
@@ -362,6 +372,7 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
   },
   "growth-decay-drill-2": {
     id: "growth-decay-drill-2",
+    group: "Unit 1 Drills",
     title: "Growth / Decay Drill — Set 2",
     description:
       "Speed drill, second set: 10 fresh multiple-choice questions on growth, decay, increasing/decreasing, and concavity — same rules as Set 1 (type from a and b, concavity from the sign of a only, negative a is NEITHER, clean up the exponent first). Click the correct answer — you get instant feedback on every question, plus a hint if you want one and an explanation once you answer. No writing needed. Target time is 10 minutes, but the timer will NOT lock or auto-submit — keep going if you need to and press Submit when you're done. Your actual time is recorded.",
@@ -372,6 +383,7 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
   },
   "growth-decay-drill-3": {
     id: "growth-decay-drill-3",
+    group: "Unit 1 Drills",
     title: "Growth / Decay Drill — Set 3 (Asymptote & Range)",
     description:
       "Speed drill, third set: 22 multiple-choice questions on horizontal asymptotes, range, and end behavior of exponential functions — including negative-a functions (the range can run DOWNWARD from the asymptote), shifts, comparing two functions' directions, reading the trend from f(0) and f(1), and describing how a function behaves as x grows large in either direction, with extra practice on negative-a end behavior. Click the correct answer — you get instant feedback on every question, plus a hint if you want one and an explanation once you answer. No writing needed. Target time is 10 minutes, but the timer will NOT lock or auto-submit — keep going if you need to and press Submit when you're done. Your actual time is recorded.",
@@ -382,6 +394,7 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
   },
   "growth-decay-drill-4": {
     id: "growth-decay-drill-4",
+    group: "Unit 1 Drills",
     title: "Growth / Decay Drill — Set 4 (Negative a)",
     description:
       "Speed drill, fourth set: 15 multiple-choice questions built entirely on the negative-a cases — the ones that flip every shortcut. With a < 0 the type is NEITHER growth nor decay, the direction reverses, the range can run DOWNWARD from the asymptote, and the dive to −∞ can hide at either end. Plus exponent clean-ups with a negative a, reading direction from f(0) and f(1), and one context question. Click the correct answer — you get instant feedback on every question, plus a hint if you want one and an explanation once you answer. No writing needed. Target time is 10 minutes, but the timer will NOT lock or auto-submit — keep going if you need to and press Submit when you're done. Your actual time is recorded.",
