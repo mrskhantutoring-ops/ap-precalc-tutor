@@ -267,7 +267,7 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
   },
   "unit2-log-functions-part2-sprint": {
     id: "unit2-log-functions-part2-sprint",
-    title: "Unit 2 — Logarithmic Functions, Part 2 — Sprint (Multiple-Select)",
+    title: "Unit 2 — Logarithmic Functions, Part 2 (Multiple-Select)",
     description:
       "20 multiple-select questions on logarithmic functions (Topics 2.10 and 2.11) — choose ALL correct options for each question. Tap the letters to choose them, or type them in the box (for example: A, B, D). You have 20 minutes. Your work auto-saves as you go and is submitted automatically when time runs out — after that the test is locked and cannot be reopened.",
     minutes: 20,
