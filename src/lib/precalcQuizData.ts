@@ -45,7 +45,7 @@ export const precalcQuizUnit2: McqItem[] = [
     ],
     "answer": 0,
     "hint": "g(x) = 2 means f(2) = x — use the inverse relationship instead of finding g first.",
-    "explanation": "g is the inverse of f, so g(x) = 2 exactly when f(2) = x. f(2) = 5·3^{2−2} + 4 = 5·1 + 4 = 9, so x = 9."
+    "explanation": "Step 1 — use the inverse: g(x) = 2 means f(2) = x, because an inverse flips inputs and outputs. Step 2 — work out f(2): f(2) = 5·3^{2−2} + 4 = 5·3^0 + 4 = 5·1 + 4 = 9. Step 3 — so x = 9, choice A. Finding g first is the long way — the flip does it in one step."
   },
   {
     "stem": "(Select all that apply) Which statements are true regarding the parent logarithmic function f(x) = log_b(x), where b > 1?",
