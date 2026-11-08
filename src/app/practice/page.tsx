@@ -65,13 +65,28 @@ export default function PracticeHub() {
   );
 }
 
-function TimedTestCard({ t }: { t: (typeof timedTests)[number] }) {
+function TimedTestCard({
+  t,
+  status,
+}: {
+  t: (typeof timedTests)[number];
+  status?: "submitted" | "started";
+}) {
   return (
     <div className="card flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <p className="font-bold text-black">{t.title}</p>
+        <p className="font-bold text-black">
+          {status === "submitted" && <span className="text-green-600">✓ </span>}
+          {t.title}
+        </p>
         <p className="mt-1 text-sm text-slate-600">
           ⏱ {t.minutes} minutes · 📝 {t.questions.length} free-response questions
+          {status === "submitted" && (
+            <span className="ml-2 font-semibold text-green-700">· ✓ Submitted</span>
+          )}
+          {status === "started" && (
+            <span className="ml-2 font-semibold text-amber-700">· In progress</span>
+          )}
         </p>
       </div>
       <Link href={`/practice/timed/${t.id}`} className="btn-primary shrink-0">
@@ -84,21 +99,25 @@ function TimedTestCard({ t }: { t: (typeof timedTests)[number] }) {
 function TimedTestFolder({
   name,
   tests,
+  doneCount,
+  statusById,
 }: {
   name: string;
   tests: (typeof timedTests)[number][];
+  doneCount: number;
+  statusById: Map<string, "submitted" | "started">;
 }) {
   return (
     <details className="card">
       <summary className="cursor-pointer font-bold text-black">
         📁 {name}{" "}
         <span className="font-normal text-slate-500">
-          — {tests.length} tests · tap to open
+          — {tests.length} tests · {doneCount} done · tap to open
         </span>
       </summary>
       <div className="mt-3 space-y-3">
         {tests.map((t) => (
-          <TimedTestCard key={t.id} t={t} />
+          <TimedTestCard key={t.id} t={t} status={statusById.get(t.id)} />
         ))}
       </div>
     </details>
@@ -109,13 +128,29 @@ function PracticeHubInner() {
   const [tab, setTab] = useState<TabId>("practice");
   const [unitId, setUnitId] = useState("unit-1");
   const [progress, setProgress] = useState<SectionProgress[] | null>(null);
+  const [timedAttempts, setTimedAttempts] = useState<{ testId: string; final: boolean }[]>([]);
 
   useEffect(() => {
     fetch("/api/progress")
       .then((r) => (r.ok ? r.json() : null))
-      .then((d) => setProgress(d?.sections ?? []))
+      .then((d) => {
+        setProgress(d?.sections ?? []);
+        setTimedAttempts(
+          (d?.timed ?? []).map((x: { testId: string; final: boolean }) => ({
+            testId: x.testId,
+            final: x.final,
+          }))
+        );
+      })
       .catch(() => setProgress([]));
   }, []);
+
+  // Submitted vs started per free-response test, for the ✓ marks.
+  const timedStatusById = new Map<string, "submitted" | "started">();
+  for (const a of timedAttempts) {
+    if (a.final) timedStatusById.set(a.testId, "submitted");
+    else if (!timedStatusById.has(a.testId)) timedStatusById.set(a.testId, "started");
+  }
 
   const byKey = new Map((progress ?? []).map((s) => [`${s.subject}|||${s.section}`, s]));
   const sections = sectionsByUnit(unitId);
@@ -242,9 +277,15 @@ function PracticeHubInner() {
           )}
           {frItems.map((item) =>
             item.kind === "group" ? (
-              <TimedTestFolder key={item.name} name={item.name} tests={item.tests} />
+              <TimedTestFolder
+                key={item.name}
+                name={item.name}
+                tests={item.tests}
+                doneCount={item.tests.filter((t) => timedStatusById.get(t.id) === "submitted").length}
+                statusById={timedStatusById}
+              />
             ) : (
-              <TimedTestCard key={item.t.id} t={item.t} />
+              <TimedTestCard key={item.t.id} t={item.t} status={timedStatusById.get(item.t.id)} />
             )
           )}
         </div>

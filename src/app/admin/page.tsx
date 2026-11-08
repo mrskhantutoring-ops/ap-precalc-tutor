@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { SUBJECTS, sectionsByUnit, sectionLabel } from "@/lib/site";
 import { plainText } from "@/lib/mathText";
+import { timedTestList } from "@/lib/timedTests";
 
 type Question = {
   id: string;
@@ -560,6 +561,48 @@ export default function Admin() {
                             </div>
                           </div>
                         )}
+                        {/* Checklist: every free-response test, done vs not started. */}
+                        {(() => {
+                          const byId = new Map((r.timedTests ?? []).map((t) => [t.testId, t]));
+                          const all = timedTestList().filter((t) => t.subject !== "algebra");
+                          const doneCount = all.filter((t) => byId.get(t.id)?.final).length;
+                          return (
+                            <div>
+                              <p className="mb-2 text-sm font-bold">
+                                Timed tests — {doneCount} of {all.length} done
+                              </p>
+                              <div className="space-y-1">
+                                {all.map((t) => {
+                                  const s = byId.get(t.id);
+                                  const state = s?.final ? "submitted" : s ? "started" : "not-started";
+                                  return (
+                                    <div key={t.id} className="flex items-center gap-2 text-sm">
+                                      <span
+                                        className={`shrink-0 font-bold ${
+                                          state === "submitted"
+                                            ? "text-green-600"
+                                            : state === "started"
+                                              ? "text-amber-600"
+                                              : "text-slate-300"
+                                        }`}
+                                      >
+                                        {state === "submitted" ? "✓" : state === "started" ? "◐" : "○"}
+                                      </span>
+                                      <span className="min-w-0 flex-1 truncate text-slate-700">{t.title}</span>
+                                      <span className="shrink-0 text-xs text-slate-400">
+                                        {state === "submitted"
+                                          ? "Submitted"
+                                          : state === "started"
+                                            ? "In progress"
+                                            : "Not started"}
+                                      </span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          );
+                        })()}
                         {(r.timedTests ?? []).length > 0 && (
                           <div>
                             <p className="mb-2 text-sm font-bold">Timed tests</p>
