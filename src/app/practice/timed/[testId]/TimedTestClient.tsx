@@ -334,10 +334,13 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
   }
 
   // Is this mcq question answered correctly (single- or multi-select)?
+  // A multi-select question only counts once it has been checked — tapping
+  // choices before pressing Check must not move the live score.
   function mcqCorrect(qi: number, key: string): boolean {
     const item = test.mcq![qi];
     const want = [...mcqCorrectIndices(item)].sort((a, b) => a - b);
     if (mcqIsMulti(item)) {
+      if (!multiDone[key]) return false;
       const got = [...(multiPicks[key] ?? [])].sort((a, b) => a - b);
       return got.length === want.length && got.every((v, i) => v === want[i]);
     }
