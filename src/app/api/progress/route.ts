@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { UNITS, sectionsByUnit, sectionLabel } from "@/lib/site";
-import { TIMED_TESTS } from "@/lib/timedTests";
+import { TIMED_TESTS, mcqCorrectIndices } from "@/lib/timedTests";
 
 export const dynamic = "force-dynamic";
 
@@ -86,9 +86,20 @@ export async function GET() {
       : Object.keys(answers).length;
     let score: { correct: number; total: number } | null = null;
     if (test?.mcq) {
-      const correctCount = test.questions.filter(
-        (q, i) => (answers[q.key] ?? "").trim().toUpperCase() === LETTERS[test.mcq![i].answer]
-      ).length;
+      // Single-answer: saved letter must match; multi-select: the saved
+      // letters ("A, C, D") must match the full correct set.
+      const correctCount = test.questions.filter((q, i) => {
+        const item = test.mcq![i];
+        const want = mcqCorrectIndices(item)
+          .map((n) => LETTERS[n])
+          .sort();
+        const got = (answers[q.key] ?? "")
+          .toUpperCase()
+          .split(/[^A-Z]+/)
+          .filter(Boolean)
+          .sort();
+        return want.length === got.length && want.every((l, j) => l === got[j]);
+      }).length;
       score = { correct: correctCount, total: test.mcq.length };
     }
     return {

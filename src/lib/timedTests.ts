@@ -10,10 +10,24 @@ export type TimedTestQuestion = {
 export type McqItem = {
   stem: string;
   choices: string[];
-  answer: number; // index into choices
+  answer: number; // index into choices (single-answer questions)
+  // Multi-select ("select all that apply"): when present, this is the FULL
+  // set of correct choice indices, and `answer` is the first of them (kept
+  // so the single-answer code paths keep working). The player renders
+  // toggles + a Check button instead of a one-tap pick.
+  answers?: number[];
   hint: string;
   explanation: string;
 };
+
+// Correct choice indices for an mcq item, single- or multi-select.
+export function mcqCorrectIndices(item: McqItem): number[] {
+  return item.answers ?? [item.answer];
+}
+
+export function mcqIsMulti(item: McqItem): boolean {
+  return item.answers !== undefined;
+}
 
 export type TimedTest = {
   id: string;
@@ -56,6 +70,7 @@ export type TimedTest = {
 };
 
 import { growthDecayDrill1, growthDecayDrill2, growthDecayDrill3, growthDecayDrill4 } from "./drillMcqData";
+import { precalcQuizUnit2 } from "./precalcQuizData";
 
 function imageSet(testId: string, dir: string, count: number, label: string): TimedTestQuestion[] {
   return Array.from({ length: count }, (_, i) => ({
@@ -358,6 +373,20 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
       { key: "q14", label: "Question 14 — Evaluate without a calculator: log₈2.", image: "/timed/change-of-base-nov3/q14.png" },
       { key: "q15", label: "Question 15 — Evaluate without a calculator: log_{1/3}27.", image: "/timed/change-of-base-nov3/q15.png" },
     ],
+  },
+  "precalc-quiz-unit2": {
+    id: "precalc-quiz-unit2",
+    title: "Precalculus Quiz — Unit 2",
+    description:
+      "Untimed demo quiz copied from your NotebookLM “Precalculus Quiz”: 14 multiple-choice questions on composite functions, inverses, exponentials, and logarithms — including four select-all-that-apply questions. Click an answer for instant feedback, a hint if you want one, and an explanation once you answer. The 10-minute mark is a target only — the timer never locks, so take your time and press Submit when you're done. Your actual time is recorded.",
+    minutes: 10,
+    softTimer: true,
+    questions: Array.from({ length: 14 }, (_, i) => ({
+      key: `q${i + 1}`,
+      label: `Question ${i + 1}`,
+      image: "",
+    })),
+    mcq: precalcQuizUnit2,
   },
   "growth-decay-drill-1": {
     id: "growth-decay-drill-1",

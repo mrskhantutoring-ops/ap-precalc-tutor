@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { TimedTest } from "@/lib/timedTests";
+import { mcqCorrectIndices, mcqIsMulti } from "@/lib/timedTests";
 import DrawingPad from "./DrawingPad";
 
 type Phase = "loading" | "setup" | "answering" | "submitted";
@@ -40,6 +41,9 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
   const [phase, setPhase] = useState<Phase>("loading");
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [picks, setPicks] = useState<Record<string, number>>({});
+  // Multi-select (select-all) mcq state: picked indices + whether checked.
+  const [multiPicks, setMultiPicks] = useState<Record<string, number[]>>({});
+  const [multiDone, setMultiDone] = useState<Record<string, boolean>>({});
   const [hintsOpen, setHintsOpen] = useState<Record<string, boolean>>({});
   const [drawings, setDrawings] = useState<Record<string, string>>({});
   const [pageCounts, setPageCounts] = useState<Record<string, number>>({});
@@ -124,7 +128,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
         const s = d?.submission;
         if (s) {
           setAnswers((s.answers ?? {}) as Record<string, string>);
-          setPicks(picksFromAnswers((s.answers ?? {}) as Record<string, string>));
+          restorePicks((s.answers ?? {}) as Record<string, string>);
           setDrawings((s.drawings ?? {}) as Record<string, string>);
           setStartedAt(s.startedAt ?? null);
           setTimeUsed(s.timeMs != null ? formatTime(Math.round(s.timeMs / 1000)) : null);
@@ -172,7 +176,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
         const s = d.submission;
         if (s?.final) {
           setAnswers((s.answers ?? {}) as Record<string, string>);
-          setPicks(picksFromAnswers((s.answers ?? {}) as Record<string, string>));
+          restorePicks((s.answers ?? {}) as Record<string, string>);
           setDrawings((s.drawings ?? {}) as Record<string, string>);
           setStartedAt(s.startedAt ?? null);
           setTimeUsed(s.timeMs != null ? formatTime(Math.round(s.timeMs / 1000)) : null);
@@ -180,7 +184,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
         } else if (s?.startedAt) {
           // Resume an in-progress draft
           setAnswers((s.answers ?? {}) as Record<string, string>);
-          setPicks(picksFromAnswers((s.answers ?? {}) as Record<string, string>));
+          restorePicks((s.answers ?? {}) as Record<string, string>);
           setDrawings((s.drawings ?? {}) as Record<string, string>);
           setStartedAt(s.startedAt);
           deadlineRef.current = new Date(s.startedAt).getTime() + test.minutes * 60 * 1000;
@@ -285,23 +289,79 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
   }
 
   // Click-MCQ: restore pick state from saved answer letters (drafts/finals).
+  // Single-answer questions save one letter ("B"); multi-select questions
+  // save the picked letters ("A, C, D"), which also means they were checked.
   const picksFromAnswers = useCallback(
     (ans: Record<string, string>) => {
-      if (!test.mcq) return {};
-      const out: Record<string, number> = {};
-      test.questions.forEach((q) => {
-        const idx = LETTERS.indexOf((ans[q.key] ?? "").trim().toUpperCase());
-        if (idx >= 0) out[q.key] = idx;
+      const picksOut: Record<string, number> = {};
+      const multiOut: Record<string, number[]> = {};
+      const doneOut: Record<string, boolean> = {};
+      if (!test.mcq) return { picks: picksOut, multiPicks: multiOut, multiDone: doneOut };
+      test.questions.forEach((q, qi) => {
+        const item = test.mcq![qi];
+        if (mcqIsMulti(item)) {
+          const idxs = (ans[q.key] ?? "")
+            .toUpperCase()
+            .split(/[^A-Z]+/)
+            .filter(Boolean)
+            .map((l) => LETTERS.indexOf(l))
+            .filter((i) => i >= 0 && i < item.choices.length);
+          if (idxs.length > 0) {
+            multiOut[q.key] = [...new Set(idxs)].sort((a, b) => a - b);
+            doneOut[q.key] = true;
+          }
+        } else {
+          const idx = LETTERS.indexOf((ans[q.key] ?? "").trim().toUpperCase());
+          if (idx >= 0) picksOut[q.key] = idx;
+        }
       });
-      return out;
+      return { picks: picksOut, multiPicks: multiOut, multiDone: doneOut };
     },
     [test.mcq, test.questions]
   );
+
+  function restorePicks(ans: Record<string, string>) {
+    const r = picksFromAnswers(ans);
+    setPicks(r.picks);
+    setMultiPicks(r.multiPicks);
+    setMultiDone(r.multiDone);
+  }
 
   function pickAnswer(key: string, idx: number) {
     if (picks[key] !== undefined) return; // one attempt per question
     setPicks((p) => ({ ...p, [key]: idx }));
     setAnswer(key, LETTERS[idx]);
+  }
+
+  // Is this mcq question answered correctly (single- or multi-select)?
+  function mcqCorrect(qi: number, key: string): boolean {
+    const item = test.mcq![qi];
+    const want = [...mcqCorrectIndices(item)].sort((a, b) => a - b);
+    if (mcqIsMulti(item)) {
+      const got = [...(multiPicks[key] ?? [])].sort((a, b) => a - b);
+      return got.length === want.length && got.every((v, i) => v === want[i]);
+    }
+    return picks[key] === item.answer;
+  }
+
+  // Multi-select: tap toggles a choice; Check locks it in and saves the
+  // picked letters ("A, C, D") through the normal answers pipeline.
+  function toggleMultiChoice(key: string, idx: number) {
+    if (multiDone[key]) return;
+    setMultiPicks((p) => {
+      const cur = p[key] ?? [];
+      const next = cur.includes(idx)
+        ? cur.filter((i) => i !== idx)
+        : [...cur, idx].sort((a, b) => a - b);
+      return { ...p, [key]: next };
+    });
+  }
+
+  function checkMulti(key: string) {
+    const cur = multiPicks[key] ?? [];
+    if (multiDone[key] || cur.length === 0) return;
+    setMultiDone((d) => ({ ...d, [key]: true }));
+    setAnswer(key, cur.map((i) => LETTERS[i]).join(", "));
   }
 
   // Tap-to-choose letters (multiple-select tests): the toggles read from and
@@ -338,6 +398,8 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
     return <p className="text-slate-500">Loading test…</p>;
   }
 
+  const hasMultiMcq = test.mcq?.some((m) => mcqIsMulti(m)) ?? false;
+
   if (phase === "setup") {
     return (
       <div className="mx-auto max-w-2xl space-y-6">
@@ -350,11 +412,11 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
         <div className="card space-y-3 text-sm text-slate-600">
           <div className="flex items-center gap-3">
             <span className="text-2xl">⏱</span>
-            <p><strong className="text-black">{test.minutes} minutes</strong> — the clock starts when you begin and cannot be paused.</p>
+            <p>{test.softTimer ? (<><strong className="text-black">{test.minutes} minutes</strong> — a target only. The clock never locks, so take your time.</>) : (<><strong className="text-black">{test.minutes} minutes</strong> — the clock starts when you begin and cannot be paused.</>)}</p>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-2xl">📝</span>
-            <p>{test.mcq ? (<><strong className="text-black">{test.questions.length} multiple-choice questions</strong> — click the correct answer for each one. You get instant feedback on every question, plus a hint if you want it and an explanation once you answer. No writing needed.</>) : test.choiceLetters ? (<><strong className="text-black">{test.questions.length} multiple-select questions</strong> — tap the letters to choose all the correct ones for each question, or type them in the box. Use the writing pad under each question for work. Need more room? You can add up to 2 extra writing pages under any question.</>) : test.softTimer ? (<><strong className="text-black">{test.questions.length} multiple-choice questions</strong> — type the letter of your answer, and use the writing pad under each question for work. Need more room? You can add up to 2 extra writing pages under any question.</>) : (<><strong className="text-black">{test.questions.length} free-response questions</strong> — type your answer, or write your work by hand on the writing pad under each one. Need more room? You can add up to 2 extra writing pages under any question.</>)}</p>
+            <p>{test.mcq ? (<><strong className="text-black">{test.questions.length} multiple-choice questions</strong> — click the correct answer for each one.{hasMultiMcq ? " Some questions ask for ALL the correct choices — tap each one, then press Check." : ""} You get instant feedback on every question, plus a hint if you want it and an explanation once you answer. No writing needed.</>) : test.choiceLetters ? (<><strong className="text-black">{test.questions.length} multiple-select questions</strong> — tap the letters to choose all the correct ones for each question, or type them in the box. Use the writing pad under each question for work. Need more room? You can add up to 2 extra writing pages under any question.</>) : test.softTimer ? (<><strong className="text-black">{test.questions.length} multiple-choice questions</strong> — type the letter of your answer, and use the writing pad under each question for work. Need more room? You can add up to 2 extra writing pages under any question.</>) : (<><strong className="text-black">{test.questions.length} free-response questions</strong> — type your answer, or write your work by hand on the writing pad under each one. Need more room? You can add up to 2 extra writing pages under any question.</>)}</p>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-2xl">💾</span>
@@ -367,7 +429,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
         </div>
         {error && <p className="text-sm text-red-600">{error}</p>}
         <button className="btn-primary w-full" onClick={start}>
-          Start {test.minutes}-minute test <span className="btn-arrow" aria-hidden>→</span>
+          {test.softTimer ? "Start test" : `Start ${test.minutes}-minute test`} <span className="btn-arrow" aria-hidden>→</span>
         </button>
       </div>
     );
@@ -390,7 +452,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
           )}
           {test.mcq && (
             <p className="mt-1 text-lg font-bold text-emerald-600">
-              Score: {test.questions.filter((q, i) => picks[q.key] === test.mcq![i].answer).length} / {test.questions.length} correct
+              Score: {test.questions.filter((q, i) => mcqCorrect(i, q.key)).length} / {test.questions.length} correct
             </p>
           )}
           {startedAt && (
@@ -403,21 +465,38 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
           <div key={q.key} className="card !p-4">
             <p className="text-sm font-bold">{q.label}</p>
             <p className="mt-1 text-sm font-medium text-slate-800">{renderMath(test.mcq[qi].stem)}</p>
-            {picks[q.key] === undefined ? (
-              <p className="mt-2 text-sm italic text-slate-400">(no answer)</p>
-            ) : (
-              <>
-                <p className={`mt-2 text-sm font-semibold ${picks[q.key] === test.mcq[qi].answer ? "text-emerald-600" : "text-red-600"}`}>
-                  Your answer: ({LETTERS[picks[q.key]]}) {renderMath(test.mcq[qi].choices[picks[q.key]])} {picks[q.key] === test.mcq[qi].answer ? "✓" : "✗"}
-                </p>
-                {picks[q.key] !== test.mcq[qi].answer && (
-                  <p className="mt-1 text-sm font-semibold text-emerald-600">
-                    Correct answer: ({LETTERS[test.mcq[qi].answer]}) {renderMath(test.mcq[qi].choices[test.mcq[qi].answer])}
+            {(() => {
+              const item = test.mcq![qi];
+              const multi = mcqIsMulti(item);
+              const answered = multi ? !!multiDone[q.key] : picks[q.key] !== undefined;
+              if (!answered) return <p className="mt-2 text-sm italic text-slate-400">(no answer)</p>;
+              const correct = mcqCorrect(qi, q.key);
+              const pickedIdxs = multi ? (multiPicks[q.key] ?? []) : [picks[q.key]];
+              const wantIdxs = mcqCorrectIndices(item);
+              const joinPicked = (idxs: number[]) => (
+                <>
+                  {idxs.map((i, n) => (
+                    <span key={i}>
+                      ({LETTERS[i]}) {renderMath(item.choices[i])}
+                      {n < idxs.length - 1 ? ", " : ""}
+                    </span>
+                  ))}
+                </>
+              );
+              return (
+                <>
+                  <p className={`mt-2 text-sm font-semibold ${correct ? "text-emerald-600" : "text-red-600"}`}>
+                    Your answer: {joinPicked(pickedIdxs)} {correct ? "✓" : "✗"}
                   </p>
-                )}
-                <p className="mt-1 text-sm leading-relaxed text-slate-600">{renderMath(test.mcq[qi].explanation)}</p>
-              </>
-            )}
+                  {!correct && (
+                    <p className="mt-1 text-sm font-semibold text-emerald-600">
+                      Correct answer{wantIdxs.length > 1 ? "s" : ""}: {joinPicked(wantIdxs)}
+                    </p>
+                  )}
+                  <p className="mt-1 text-sm leading-relaxed text-slate-600">{renderMath(item.explanation)}</p>
+                </>
+              );
+            })()}
           </div>
         ) : (
             <div key={q.key} className="card !p-4">
@@ -479,7 +558,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
   ).length;
 
   const correctCount = test.mcq
-    ? test.questions.filter((q, i) => picks[q.key] === test.mcq![i].answer).length
+    ? test.questions.filter((q, i) => mcqCorrect(i, q.key)).length
     : 0;
 
   return (
@@ -519,6 +598,63 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
               {q.label}
             </span>
             <p className="mt-3 text-lg font-semibold leading-relaxed text-slate-900">{renderMath(test.mcq[qi].stem)}</p>
+            {mcqIsMulti(test.mcq[qi]) ? (
+              <>
+                <p className="mt-2 text-sm font-semibold text-slate-500">Choose ALL the correct answers, then press Check.</p>
+                <div className="mt-4 space-y-2">
+                  {test.mcq[qi].choices.map((choice, ci) => {
+                    const sel = (multiPicks[q.key] ?? []).includes(ci);
+                    const done = !!multiDone[q.key];
+                    const isAnswer = mcqCorrectIndices(test.mcq![qi]).includes(ci);
+                    const cls = !done
+                      ? sel
+                        ? "border-black bg-slate-900 text-white"
+                        : "border-slate-200 bg-white hover:border-slate-400 hover:bg-slate-50"
+                      : isAnswer
+                        ? "border-emerald-500 bg-emerald-50"
+                        : sel
+                          ? "border-red-400 bg-red-50"
+                          : "border-slate-200 bg-white opacity-60";
+                    return (
+                      <button
+                        key={ci}
+                        type="button"
+                        disabled={done}
+                        aria-pressed={sel}
+                        onClick={() => toggleMultiChoice(q.key, ci)}
+                        className={`flex w-full items-start gap-3 rounded-xl border-2 px-4 py-3 text-left text-base transition ${cls}`}
+                      >
+                        <span className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-sm font-bold ${done && isAnswer ? "bg-emerald-500 text-white" : done && sel ? "bg-red-400 text-white" : sel ? "bg-white text-black" : "bg-slate-100 text-slate-600"}`}>
+                          {done && isAnswer ? "✓" : done && sel ? "✗" : sel ? "✓" : LETTERS[ci]}
+                        </span>
+                        <span className="leading-relaxed">{renderMath(choice)}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                {!multiDone[q.key] && (
+                  <button
+                    type="button"
+                    disabled={(multiPicks[q.key] ?? []).length === 0}
+                    onClick={() => checkMulti(q.key)}
+                    className="btn-primary mt-4"
+                  >
+                    Check answer
+                  </button>
+                )}
+                {multiDone[q.key] && (
+                  <div className={`mt-4 rounded-xl p-4 ${mcqCorrect(qi, q.key) ? "bg-emerald-50" : "bg-red-50"}`}>
+                    <p className={`font-bold ${mcqCorrect(qi, q.key) ? "text-emerald-700" : "text-red-700"}`}>
+                      {mcqCorrect(qi, q.key)
+                        ? "✓ Yes — correct!"
+                        : `✗ Not quite — the correct answers are (${mcqCorrectIndices(test.mcq![qi]).map((i) => LETTERS[i]).join(", ")}).`}
+                    </p>
+                    <p className="mt-1 text-sm leading-relaxed text-slate-700">{renderMath(test.mcq[qi].explanation)}</p>
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
             <div className="mt-4 space-y-2">
               {test.mcq[qi].choices.map((choice, ci) => {
                 const pick = picks[q.key];
@@ -557,6 +693,8 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
                 </p>
                 <p className="mt-1 text-sm leading-relaxed text-slate-700">{renderMath(test.mcq[qi].explanation)}</p>
               </div>
+            )}
+              </>
             )}
             <div className="mt-4 border-t border-slate-100 pt-3">
               <button
