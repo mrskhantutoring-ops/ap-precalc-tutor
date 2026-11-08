@@ -146,17 +146,28 @@ export const precalcQuizUnit2: McqItem[] = [
     "explanation": "The domain is x > −4. As x approaches −4 from the right, log_3(x+4) dives to −∞, and the −2 flips it up, so k(x) → ∞. As x → ∞, log_3(x+4) → ∞ and the −2 drags k(x) down to −∞."
   },
   {
-    "stem": "(Select all that apply) log(2x−4) − log(x−2) = log(5x−8).",
+    "stem": "What is the value of log_3(81)?",
     "choices": [
-      "Algebraic simplification of the condensed equation yields x = 2 as a potential solution",
-      "The valid solution is x = 2 because log(0) = 0",
-      "Substituting x = 2 into the original equation requires evaluating log of zero, which is undefined",
-      "The given equation has no real solution"
+      "3",
+      "9",
+      "4",
+      "27"
     ],
-    "answer": 0,
-    "answers": [0, 2, 3],
-    "hint": "Condense the left side first — but before you trust the root you get, put it back into every log in the original equation.",
-    "explanation": "The left side condenses to log((2x−4)/(x−2)) = log 2, so log 2 = log(5x−8) gives x = 2 as a candidate. But x = 2 makes 2x−4 = 0 and x−2 = 0, so the left side needs log(0), which is undefined — x = 2 is extraneous and there is no real solution. And log(0) is never 0."
+    "answer": 2,
+    "hint": "Ask what power of 3 gives 81.",
+    "explanation": "log_3(81) asks: 3 to what power is 81? 3^4 = 81, so the answer is 4. (3^3 is only 27.)"
+  },
+  {
+    "stem": "Let f(x) = x^{2} and g(x) = x + 1. What is the value of (g∘f)(2)?",
+    "choices": [
+      "3",
+      "5",
+      "4",
+      "9"
+    ],
+    "answer": 1,
+    "hint": "Work inside out: f first, then put that result into g.",
+    "explanation": "(g∘f)(2) = g(f(2)). f(2) = 2^{2} = 4, and g(4) = 4 + 1 = 5. (9 is (f∘g)(2) — the order the other way round.)"
   },
   {
     "stem": "Which expression is equivalent to log_7(15) using the Change of Base Formula with natural logs?",
