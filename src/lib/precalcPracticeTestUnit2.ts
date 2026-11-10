@@ -180,7 +180,7 @@ export const precalcPracticeTestUnit2: McqItem[] = [
     ],
     "answer": 1,
     "hint": "Argument on top, base underneath.",
-    "explanation": "log_b(a) = ln a / ln b, with a = 9 (argument on top) and b = 1/4 (base on the bottom). Option D is not equal: ln(1/4) = −ln 4, so ln 9 / ln(1/4) = −ln 9 / ln 4."
+    "explanation": "Change of base is a division: log_b(a) = ln a / ln b, with a = 9 (argument on top) and b = 1/4 (base on the bottom) — so the answer is B. C is the quotient rule in reverse: ln(9) − ln(1/4) = ln(9/(1/4)) = ln(36), not a change of base. D is close but wrong: ln(1/4) = −ln 4, so B = −ln 9 / ln 4, the negative of D."
   },
   {
     "stem": "(Select all that apply) Let f(x) = −2·(1/3)ˣ⁺¹ + 5. Which statements are true?",
