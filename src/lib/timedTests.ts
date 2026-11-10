@@ -391,7 +391,7 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
   },
   "precalc-practice-test-unit2": {
     id: "precalc-practice-test-unit2",
-    title: "Precalculus Practice Test — Unit 2",
+    title: "Precalculus Practice Test — Unit 2 — Nov 10, 2026",
     description:
       "Practice test, the parallel form of the Precalculus Quiz — Unit 2: the same 15 topics in the same order, all new numbers and functions — 15 multiple-choice questions on composite functions, inverses, exponentials, and logarithms, including three select-all-that-apply questions. Click an answer for instant feedback, a hint if you want one, and an explanation once you answer. You have 25 minutes. The test is submitted automatically when time runs out — after that it is locked and cannot be reopened.",
     minutes: 25,
