@@ -393,8 +393,8 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
     id: "precalc-practice-test-unit2",
     title: "Precalculus Practice Test — Unit 2",
     description:
-      "Untimed practice test, the parallel form of the Precalculus Quiz — Unit 2: the same 15 topics in the same order, all new numbers and functions — 15 multiple-choice questions on composite functions, inverses, exponentials, and logarithms, including three select-all-that-apply questions. Click an answer for instant feedback, a hint if you want one, and an explanation once you answer. The 30-minute mark is a target only — the timer never locks, so take your time and press Submit when you're done. Your actual time is recorded.",
-    minutes: 30,
+      "Untimed practice test, the parallel form of the Precalculus Quiz — Unit 2: the same 15 topics in the same order, all new numbers and functions — 15 multiple-choice questions on composite functions, inverses, exponentials, and logarithms, including three select-all-that-apply questions. Click an answer for instant feedback, a hint if you want one, and an explanation once you answer. The 25-minute mark is a target only — the timer never locks, so take your time and press Submit when you're done. Your actual time is recorded.",
+    minutes: 25,
     softTimer: true,
     questions: Array.from({ length: 15 }, (_, i) => ({
       key: `q${i + 1}`,
