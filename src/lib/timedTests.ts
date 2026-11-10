@@ -71,6 +71,7 @@ export type TimedTest = {
 
 import { growthDecayDrill1, growthDecayDrill2, growthDecayDrill3, growthDecayDrill4 } from "./drillMcqData";
 import { precalcQuizUnit2 } from "./precalcQuizData";
+import { precalcPracticeTestUnit2 } from "./precalcPracticeTestUnit2";
 
 function imageSet(testId: string, dir: string, count: number, label: string): TimedTestQuestion[] {
   return Array.from({ length: count }, (_, i) => ({
@@ -387,6 +388,20 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
       image: "",
     })),
     mcq: precalcQuizUnit2,
+  },
+  "precalc-practice-test-unit2": {
+    id: "precalc-practice-test-unit2",
+    title: "Precalculus Practice Test — Unit 2",
+    description:
+      "Untimed practice test, the parallel form of the Precalculus Quiz — Unit 2: the same 15 topics in the same order, all new numbers and functions — 15 multiple-choice questions on composite functions, inverses, exponentials, and logarithms, including three select-all-that-apply questions. Click an answer for instant feedback, a hint if you want one, and an explanation once you answer. The 30-minute mark is a target only — the timer never locks, so take your time and press Submit when you're done. Your actual time is recorded.",
+    minutes: 30,
+    softTimer: true,
+    questions: Array.from({ length: 15 }, (_, i) => ({
+      key: `q${i + 1}`,
+      label: `Question ${i + 1}`,
+      image: "",
+    })),
+    mcq: precalcPracticeTestUnit2,
   },
   "growth-decay-drill-1": {
     id: "growth-decay-drill-1",
