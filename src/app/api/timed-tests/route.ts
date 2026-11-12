@@ -63,6 +63,51 @@ function mergeDrawings(
   return out;
 }
 
+// Per-question activity timing: { "q1": { first: <ms from startedAt>, last: <ms from startedAt> }, ... }.
+// first = first keystroke / first pad stroke / first tap on that question ("picked up the
+// pencil"); last = last activity on it ("put the pencil down"). Offsets are clamped to the
+// test window and first is never after last.
+type QuestionTimes = Record<string, { first: number; last: number }>;
+
+function sanitizeQuestionTimes(input: unknown, keys: string[], maxMs: number): QuestionTimes {
+  const keep = new Set(keys);
+  const out: QuestionTimes = {};
+  if (input && typeof input === "object") {
+    for (const [k, v] of Object.entries(input as Record<string, unknown>)) {
+      if (!keep.has(k) || !v || typeof v !== "object") continue;
+      const first = (v as Record<string, unknown>).first;
+      const last = (v as Record<string, unknown>).last;
+      if (typeof first !== "number" || typeof last !== "number") continue;
+      if (!Number.isFinite(first) || !Number.isFinite(last)) continue;
+      const f = Math.max(0, Math.min(maxMs, Math.floor(first)));
+      const l = Math.max(0, Math.min(maxMs, Math.floor(last)));
+      out[k] = { first: Math.min(f, l), last: Math.max(f, l) };
+    }
+  }
+  return out;
+}
+
+function mergeQuestionTimes(stored: unknown, incoming: QuestionTimes): QuestionTimes {
+  // Keep the earliest start and the latest stop per question across saves —
+  // a reload resumes from the stored draft, so merges must never lose time.
+  const out: QuestionTimes = {};
+  const s = (stored ?? {}) as Record<string, unknown>;
+  for (const [k, v] of Object.entries(s)) {
+    if (v && typeof v === "object") {
+      const first = (v as Record<string, unknown>).first;
+      const last = (v as Record<string, unknown>).last;
+      if (typeof first === "number" && typeof last === "number") out[k] = { first, last };
+    }
+  }
+  for (const [k, v] of Object.entries(incoming)) {
+    const prev = out[k];
+    out[k] = prev
+      ? { first: Math.min(prev.first, v.first), last: Math.max(prev.last, v.last) }
+      : v;
+  }
+  return out;
+}
+
 async function finalizeIfExpired(row: { id: string; final: boolean; startedAt: Date; answers: unknown }, minutes: number, soft = false) {
   if (row.final) return false;
   if (soft) return false; // soft-timer drills never auto-finalize — the timer is a target only
@@ -108,6 +153,7 @@ export async function GET(req: NextRequest) {
     submission: {
       answers: (fresh?.answers ?? {}) as Record<string, string>,
       drawings: (fresh?.drawings ?? {}) as Record<string, string>,
+      questionTimes: (fresh?.questionTimes ?? {}) as QuestionTimes,
       final: fresh?.final ?? false,
       startedAt: fresh?.startedAt.toISOString(),
       finishedAt: fresh?.finishedAt?.toISOString() ?? null,
@@ -130,6 +176,8 @@ export async function POST(req: NextRequest) {
 
   const answers = sanitizeAnswers(body?.answers, test.questions.map((q) => q.key));
   const drawingPatch = sanitizeDrawings(body?.drawings, test.questions.map((q) => q.key));
+  const maxMs = test.softTimer ? 24 * 60 * 60 * 1000 : test.minutes * 60 * 1000;
+  const times = sanitizeQuestionTimes(body?.questionTimes, test.questions.map((q) => q.key), maxMs);
   const wantFinal = body?.final === true;
 
   const existing = await db.timedSubmission.findUnique({
@@ -153,6 +201,7 @@ export async function POST(req: NextRequest) {
         data: {
           answers,
           drawings,
+          questionTimes: mergeQuestionTimes(existing.questionTimes, times),
           final: true,
           finishedAt: new Date(end),
           timeMs: Math.max(0, end - existing.startedAt.getTime()),
@@ -162,7 +211,7 @@ export async function POST(req: NextRequest) {
     }
     const updated = await db.timedSubmission.update({
       where: { id: existing.id },
-      data: { answers, drawings },
+      data: { answers, drawings, questionTimes: mergeQuestionTimes(existing.questionTimes, times) },
     });
     return NextResponse.json({ ok: true, final: false, startedAt: updated.startedAt.toISOString() });
   }
@@ -174,6 +223,7 @@ export async function POST(req: NextRequest) {
       userId: user.id,
       answers,
       drawings: mergeDrawings({}, drawingPatch),
+      questionTimes: times,
       final: wantFinal,
       finishedAt: wantFinal ? new Date() : null,
       timeMs: wantFinal ? 0 : null,

@@ -16,6 +16,22 @@ function formatTime(s: number) {
 
 const LETTERS = "ABCDEFGH";
 
+type QuestionTimes = Record<string, { first: number; last: number }>;
+
+function asQuestionTimes(v: unknown): QuestionTimes {
+  const out: QuestionTimes = {};
+  if (v && typeof v === "object") {
+    for (const [k, e] of Object.entries(v as Record<string, unknown>)) {
+      if (e && typeof e === "object") {
+        const first = (e as Record<string, unknown>).first;
+        const last = (e as Record<string, unknown>).last;
+        if (typeof first === "number" && typeof last === "number") out[k] = { first, last };
+      }
+    }
+  }
+  return out;
+}
+
 // Render plain-text math: ^{...}, ^(...), and ^x become superscripts.
 function renderMath(text: string) {
   const token = /\^\{([^}]*)\}|\^\(([^)]*)\)|\^([A-Za-z0-9∞+\-−])/g;
@@ -66,6 +82,11 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
   const drawingsRef = useRef(drawings);
   drawingsRef.current = drawings;
   const dirtyDrawingsRef = useRef<Set<string>>(new Set());
+  // Per-question timing: { q1: { first: <ms from test start>, last: <ms from test start> } }.
+  // first = first keystroke / first pad stroke / first tap on that question
+  // ("picked up the pencil"); last = last activity on it ("put the pencil down").
+  const questionTimesRef = useRef<QuestionTimes>({});
+  const startMsRef = useRef<number | null>(null);
 
   const saveDraft = useCallback(async () => {
     if (!dirtyRef.current) return;
@@ -88,6 +109,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
           testId: test.id,
           answers: answersRef.current,
           drawings: drawingPatch,
+          questionTimes: questionTimesRef.current,
           final: false,
         }),
       });
@@ -115,6 +137,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
           testId: test.id,
           answers: answersRef.current,
           drawings: drawingsRef.current,
+          questionTimes: questionTimesRef.current,
           final: true,
         }),
       });
@@ -130,6 +153,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
           setAnswers((s.answers ?? {}) as Record<string, string>);
           restorePicks((s.answers ?? {}) as Record<string, string>);
           setDrawings((s.drawings ?? {}) as Record<string, string>);
+          questionTimesRef.current = asQuestionTimes(s.questionTimes);
           setStartedAt(s.startedAt ?? null);
           setTimeUsed(s.timeMs != null ? formatTime(Math.round(s.timeMs / 1000)) : null);
         }
@@ -178,6 +202,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
           setAnswers((s.answers ?? {}) as Record<string, string>);
           restorePicks((s.answers ?? {}) as Record<string, string>);
           setDrawings((s.drawings ?? {}) as Record<string, string>);
+          questionTimesRef.current = asQuestionTimes(s.questionTimes);
           setStartedAt(s.startedAt ?? null);
           setTimeUsed(s.timeMs != null ? formatTime(Math.round(s.timeMs / 1000)) : null);
           setPhase("submitted");
@@ -186,8 +211,10 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
           setAnswers((s.answers ?? {}) as Record<string, string>);
           restorePicks((s.answers ?? {}) as Record<string, string>);
           setDrawings((s.drawings ?? {}) as Record<string, string>);
+          questionTimesRef.current = asQuestionTimes(s.questionTimes);
           setStartedAt(s.startedAt);
           deadlineRef.current = new Date(s.startedAt).getTime() + test.minutes * 60 * 1000;
+          startMsRef.current = new Date(s.startedAt).getTime();
           warnedRef.current = { five: false, one: false }; timeUpRef.current = false; setOverSec(0);
           finishedRef.current = false;
           setPhase("answering");
@@ -252,6 +279,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
       const now = new Date().toISOString();
       setStartedAt(now);
       deadlineRef.current = Date.now() + test.minutes * 60 * 1000;
+      startMsRef.current = Date.now();
       warnedRef.current = { five: false, one: false }; timeUpRef.current = false; setOverSec(0);
       finishedRef.current = false;
       setPhase("answering");
@@ -262,7 +290,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
       const res = await fetch("/api/timed-tests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ testId: test.id, answers: answersRef.current, final: false }),
+        body: JSON.stringify({ testId: test.id, answers: answersRef.current, questionTimes: questionTimesRef.current, final: false }),
       });
       if (!res.ok) {
         const d = await res.json().catch(() => null);
@@ -275,6 +303,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
       const d = await res.json();
       setStartedAt(d.startedAt);
       deadlineRef.current = new Date(d.startedAt).getTime() + test.minutes * 60 * 1000;
+      startMsRef.current = new Date(d.startedAt).getTime();
       warnedRef.current = { five: false, one: false }; timeUpRef.current = false; setOverSec(0);
       finishedRef.current = false;
       setPhase("answering");
@@ -283,7 +312,23 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
     }
   }
 
+  // Per-question timing: first activity on a question (first keystroke, first
+  // pad stroke, first tap) marks "picked up the pencil"; every later activity
+  // moves "last" ("put the pencil down"). Offsets are ms from the test start.
+  function noteActivity(key: string) {
+    const start = startMsRef.current;
+    if (start === null) return;
+    const off = Math.max(0, Date.now() - start);
+    const prev = questionTimesRef.current[key];
+    questionTimesRef.current = {
+      ...questionTimesRef.current,
+      [key]: prev ? { first: prev.first, last: off } : { first: off, last: off },
+    };
+    dirtyRef.current = true;
+  }
+
   function setAnswer(key: string, value: string) {
+    noteActivity(key);
     dirtyRef.current = true;
     setAnswers((a) => ({ ...a, [key]: value }));
   }
@@ -351,6 +396,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
   // picked letters ("A, C, D") through the normal answers pipeline.
   function toggleMultiChoice(key: string, idx: number) {
     if (multiDone[key]) return;
+    noteActivity(key);
     setMultiPicks((p) => {
       const cur = p[key] ?? [];
       const next = cur.includes(idx)
@@ -387,6 +433,7 @@ export default function TimedTestClient({ test, preview = false }: { test: Timed
   }
 
   function setDrawing(key: string, value: string | null) {
+    noteActivity(key);
     dirtyRef.current = true;
     dirtyDrawingsRef.current.add(key);
     setDrawings((d) => {

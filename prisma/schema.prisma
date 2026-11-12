@@ -106,6 +106,7 @@ model TimedSubmission {
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   answers    Json     @default("{}") // { "q1": "...", "q2": "...", ... }
   drawings   Json     @default("{}") // { "q1": "data:image/jpeg;base64,...", ... } handwriting pads
+  questionTimes Json  @default("{}") // { "q1": { first: <ms from startedAt>, last: <ms from startedAt> }, ... } per-question activity timing (first keystroke / first pad stroke → last activity)
   startedAt  DateTime @default(now())
   final      Boolean  @default(false)
   finishedAt DateTime?

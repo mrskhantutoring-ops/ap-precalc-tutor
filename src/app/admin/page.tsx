@@ -76,6 +76,7 @@ type TimedTestSubmission = {
   final: boolean;
   answers: Record<string, string>;
   drawings: Record<string, string>;
+  questionTimes?: Record<string, { first: number; last: number }>;
   startedAt: string;
   finishedAt: string | null;
   timeMs: number | null;
@@ -638,6 +639,18 @@ export default function Admin() {
                                     {qs.map((q) => (
                                       <div key={q.key} className="rounded-lg bg-slate-50 p-2.5">
                                         <p className="text-xs font-bold text-slate-500">{q.label}</p>
+                                        {t.questionTimes?.[q.key] && (() => {
+                                          const qt = t.questionTimes![q.key];
+                                          const fmt = (ms: number) => {
+                                            const s = Math.max(0, Math.round(ms / 1000));
+                                            return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+                                          };
+                                          return (
+                                            <p className="mt-0.5 text-xs text-slate-400">
+                                              ⏱ Started {fmt(qt.first)} · last worked {fmt(qt.last)} · active {fmt(qt.last - qt.first)}
+                                            </p>
+                                          );
+                                        })()}
                                         <p className="mt-0.5 whitespace-pre-wrap text-slate-700">
                                           {t.answers?.[q.key]?.trim() ? t.answers[q.key] : <span className="italic text-slate-400">(no answer)</span>}
                                         </p>

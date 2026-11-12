@@ -98,6 +98,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       final: t.final,
       answers: t.answers as Record<string, string>,
       drawings: (t.drawings ?? {}) as Record<string, string>,
+      questionTimes: (t.questionTimes ?? {}) as Record<string, { first: number; last: number }>,
       startedAt: t.startedAt.toISOString(),
       finishedAt: t.finishedAt?.toISOString() ?? null,
       timeMs: t.timeMs ?? null,
