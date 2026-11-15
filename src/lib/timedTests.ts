@@ -72,6 +72,7 @@ export type TimedTest = {
 import { growthDecayDrill1, growthDecayDrill2, growthDecayDrill3, growthDecayDrill4 } from "./drillMcqData";
 import { precalcQuizUnit2 } from "./precalcQuizData";
 import { precalcPracticeTestUnit2 } from "./precalcPracticeTestUnit2";
+import { expLogQuizNov16 } from "./expLogQuizNov16";
 
 function imageSet(testId: string, dir: string, count: number, label: string): TimedTestQuestion[] {
   return Array.from({ length: count }, (_, i) => ({
@@ -401,6 +402,19 @@ export const TIMED_TESTS: Record<string, TimedTest> = {
       image: "",
     })),
     mcq: precalcPracticeTestUnit2,
+  },
+  "exp-log-quiz-nov16": {
+    id: "exp-log-quiz-nov16",
+    title: "Exponential & Logarithmic Equations Quiz — Nov 16, 2026",
+    description:
+      "The NotebookLM “Exponential and Logarithmic Equations Mastery” quiz: 12 multiple-choice questions on exponential and logarithmic equations and inequalities — including four select-all-that-apply questions. Click an answer for instant feedback, a hint if you want one, and an explanation once you answer. You have 20 minutes. The test is submitted automatically when time runs out — after that it is locked and cannot be reopened.",
+    minutes: 20,
+    questions: Array.from({ length: 12 }, (_, i) => ({
+      key: `q${i + 1}`,
+      label: `Question ${i + 1}`,
+      image: "",
+    })),
+    mcq: expLogQuizNov16,
   },
   "growth-decay-drill-1": {
     id: "growth-decay-drill-1",
